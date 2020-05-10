@@ -33,6 +33,10 @@
 * Go to project directory
 
         cd <project_root_path>
+        
+    * For my computer only (Tested on)
+                
+                cd C:\Projects\AI_Crime_Analytics
 
 * Create conda environment (using **package-list.txt** file provided in this project root directory):
     * Reference link: https://docs.conda.io/projects/conda/en/latest/commands/list.html
