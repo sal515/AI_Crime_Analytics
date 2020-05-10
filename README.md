@@ -37,7 +37,13 @@
 * Create conda environment (using **package-list.txt** file provided in this project root directory):
     * Reference link: https://docs.conda.io/projects/conda/en/latest/commands/list.html
     
-            conda create -n <environment_Name> --file <project_root_path>\package-list.txt 
+                conda create -n <environment_Name> --file <...>\AI_Crime_Analytics\package-list.txt 
+                
+        * For my computer only (Tested on)
+                
+                conda create -n <environment_Name> --file C:\Projects\AI_Crime_Analytics\package-list.txt 
+            
+            
 
 * Activate conda environment 
     
@@ -58,7 +64,14 @@
 
             conda list -n <environment_Name>
 
-* Update conda package list:
+* Update conda package list (Project environment should be activated already):
     * Reference link: https://docs.conda.io/projects/conda/en/latest/commands/list.html
 
-            conda list --export > <project_root_path>\package-list.txt
+                conda list --export > <...>\AI_Crime_Analytics\package-list.txt
+            
+        * For my computer only (Tested on)
+            
+                conda list --export > C:\Projects\AI_Crime_Analytics\package-list.txt
+            
+
+            
