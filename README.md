@@ -1,9 +1,11 @@
 # Environment Requirements:
 * Python 3.7.2 (Tested on)
 * Windows 10 Home x64 (Tested on)
-* Miniconda (Install Instructions provided in **Installations Instructions** section)
+* Miniconda (Install Instructions provided in **Installations
+ Instructions** section)
+    * conda 4.8.3
 
-#Installation Instructions
+# Installation Instructions
 ### Install Miniconda: (to be able to use conda virtual environment)
 * Download link and install: 
 
@@ -29,7 +31,7 @@
           
 
 # Run Instructions
-###Pe-requisite: Create conda virtual environment for the project
+### Pe-requisite: Create conda virtual environment for the project
 * Go to project directory
 
         cd <project_root_path>
@@ -41,17 +43,19 @@
 * Create conda environment (using **package-list.txt** file provided in this project root directory):
     * Reference link: https://docs.conda.io/projects/conda/en/latest/commands/list.html
     
-                conda create -n <environment_Name> --file <...>\AI_Crime_Analytics\package-list.txt 
+                conda create -n <environment_name> --file <...>\AI_Crime_Analytics\package-list.txt 
                 
         * For my computer only (Tested on)
                 
-                conda create -n <environment_Name> --file C:\Projects\AI_Crime_Analytics\package-list.txt 
+                conda create -n <environment_name> --file C:\Projects\AI_Crime_Analytics\package-list.txt 
             
             
 
 * Activate conda environment 
     
-        activate <environment_Name>
+        activate <environment_name>
+        
+    * If the virtual environment was successfully activated, the command prompt will show (environment_name) on the left of each new line on the command prompt
        
 * Run project files 
     
@@ -66,7 +70,7 @@
 * View conda package list:
     * Reference link: https://docs.conda.io/projects/conda/en/latest/commands/list.html
 
-            conda list -n <environment_Name>
+            conda list -n <environment_name>
 
 * Update conda package list (Project environment should be activated already):
     * Reference link: https://docs.conda.io/projects/conda/en/latest/commands/list.html
@@ -77,5 +81,29 @@
             
                 conda list --export > C:\Projects\AI_Crime_Analytics\package-list.txt
             
-
             
+* Update conda spec-file (Project environment should be activated already):
+    * Reference link: https://docs.conda.io/projects/conda/en/4.6.1/user-guide/tasks/manage-environments.html#creating-an-environment-with-commands
+
+                conda list --explicit > <...>\AI_Crime_Analytics\spec-file.txt
+            
+        * For my computer only (Tested on)
+            
+                conda list --explicit > C:\Projects\AI_Crime_Analytics\spec-file.txt
+            
+            
+            
+
+* To create a new conda environment from spec-file:
+    * Reference link: https://docs.conda.io/projects/conda/en/4.6.1/user-guide/tasks/manage-environments.html#creating-an-environment-with-commands
+
+                conda create --name <environment_name> --file <...>\AI_Crime_Analytics\spec-file.txt
+            
+        * For my computer only (Tested on)
+            
+                conda create --name <environment_name> --file C:\Projects\AI_Crime_Analytics\spec-file.txt           
+                
+# General References:
+* Tasks with conda:
+    
+        https://docs.conda.io/projects/conda/en/4.6.1/user-guide/tasks/manage-environments.html#creating-an-environment-with-commands
