@@ -4,6 +4,7 @@
 * Miniconda (Install Instructions provided in **Installations
  Instructions** section)
     * conda 4.8.3
+* Geopandas
 
 # Installation Instructions
 ### Install Miniconda: (to be able to use conda virtual environment)
@@ -28,7 +29,12 @@
                 https://slproweb.com/products/Win32OpenSSL.html
                 
     * Please run the **"update conda"** command provided in the previous step to test if the issue is resolved. 
-          
+
+### Install Geopandas: (conda virtual environment needs to be activated beforehand)
+* Setup command using conda manager: 
+
+        conda install geopandas  
+    * Reference link: https://geopandas.org/install.html
 
 # Run Instructions
 ### Pe-requisite: Create conda virtual environment for the project
@@ -94,7 +100,7 @@
             
             
 
-* To create a new conda environment from spec-file:
+* To create a new conda environment from spec-file (Environment specific):
     * Reference link: https://docs.conda.io/projects/conda/en/4.6.1/user-guide/tasks/manage-environments.html#creating-an-environment-with-commands
 
                 conda create --name <environment_name> --file <...>\AI_Crime_Analytics\spec-file.txt
