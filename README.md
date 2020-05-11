@@ -5,7 +5,7 @@
  Instructions** section)
     * conda 4.8.3
 
-# Libraries (Installation Instructions section provide installation steps): 
+# Required Libraries (Installation Instructions section provide installation steps): 
 * Geopandas 
 
 # Installation Instructions
