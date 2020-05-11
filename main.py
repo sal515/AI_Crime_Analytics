@@ -33,6 +33,12 @@ crime_data = geopandas.read_file(shapes_data_path)
 crime_data.plot()
 save_figure("all_crime_data.png")
 
+# Identifying the bounds of the given data
+# By creating a polygon using all the crime data points
+all_points = list(map(lambda point: list(point.coords)[0], crime_data.geometry))
+poly = polygon(all_points)
+print(poly.bounds)
+
 
 
 # ===== end of program =====
