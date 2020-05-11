@@ -4,7 +4,9 @@
 * Miniconda (Install Instructions provided in **Installations
  Instructions** section)
     * conda 4.8.3
-* Geopandas
+
+# Libraries (Installation Instructions section provide installation steps): 
+* Geopandas 
 
 # Installation Instructions
 ### Install Miniconda: (to be able to use conda virtual environment)
@@ -30,7 +32,7 @@
                 
     * Please run the **"update conda"** command provided in the previous step to test if the issue is resolved. 
 
-### Install Geopandas: (conda virtual environment needs to be activated beforehand)
+### Install Geopandas: (conda virtual environment needs to be activated before installation)
 * Setup command using conda manager: 
 
         conda install geopandas  
