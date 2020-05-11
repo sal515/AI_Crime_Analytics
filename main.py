@@ -5,11 +5,13 @@
 # For COMP 472 Section - ABIX – Summer 2020
 # --------------------------------------------------------
 
-# start of driver
+# ====== imports ======
+# ====== constant variables ======
+# ====== logic ======
 
-# read shape file using Pyshp library
+# read shape file using geopanda
 
 
 
-# end of program
+# ===== end of program =====
 print("program terminated")
