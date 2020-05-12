@@ -7,6 +7,8 @@
 
 # Required Libraries (Installation Instructions section provide installation steps): 
 * Geopandas 
+* matplotlib
+* numpy
 
 # Installation Instructions
 ### Install Miniconda: (to be able to use conda virtual environment)
