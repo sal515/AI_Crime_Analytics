@@ -4,8 +4,8 @@
 attrs=19.3.0=py_0
 blas=1.0=mkl
 bzip2=1.0.8=he774522_0
-ca-certificates=2020.4.5.1=hecc5488_0
-certifi=2020.4.5.1=py37hc8dfbb8_0
+ca-certificates=2020.1.1=0
+certifi=2020.4.5.1=py37_0
 click=7.1.2=py_0
 click-plugins=1.1.1=py_0
 cligj=0.5.0=py37_0
