@@ -42,61 +42,57 @@ x_y_pair = list(map(lambda point: list(point.coords)[0], crime_data.geometry))
 x = list(map(lambda point: point[0], x_y_pair))
 y = list(map(lambda point: point[1], x_y_pair))
 
-# To draw the grid, identifying the bounds of the given data
+# To draw the grids: identifying the bounds of the given data
 # By creating a polygon using all the crime data points
-poly = polygon(x_y_pair)
-bounds = poly.bounds
-print("bounds: (minx-0, miny-1, maxx-2, maxy-3) ", bounds)
+min_x = min(x)
+min_y = min(y)
+max_x = max(x)
+max_y = max(y)
+print(f"bounds: (minx:{min_x}, miny:{min_y}, maxx:{max_x}, maxy:{max_y}) ")
 
-# To draw the grids on the plot, extracting the x and y points of the grids
-cols = int(math.ceil(abs(abs(bounds[2]) - abs(bounds[0])) / square_grid_length))
-rows = int(math.ceil(abs(abs(bounds[3]) - abs(bounds[1])) / square_grid_length))
+# poly = polygon(x_y_pair)
+# bounds = poly.bounds
+# print("bounds: (minx-0, miny-1, maxx-2, maxy-3) ", bounds)
 
-# FIXME: CHECK EQUATION - WHEN TO ADD AND WHEN TO SUBTRACT - DONE?
+# To draw the grids: calculating required rows and cols
+cols = int(math.ceil(abs(abs(max_x) - abs(min_x)) / square_grid_length))
+rows = int(math.ceil(abs(abs(max_y) - abs(min_y)) / square_grid_length))
+
+# To get perfect square grids: calculating the bounds
+lower_x_bound = min_x
+upper_x_bound = min_x + (cols * square_grid_length)
+lower_y_bound = min_y
+upper_y_bound = min_y + (rows * square_grid_length)
+
+# To draw the grids:, generating the x and y points of the grids
 col_points = list(
-    np.arange(bounds[0], (bounds[0] + (cols * square_grid_length) + (square_grid_length / 3)), square_grid_length))
+    np.arange(min_x, (upper_x_bound + (square_grid_length / 3)), square_grid_length))
 
 row_points = list(
-    np.arange(bounds[1], (bounds[1] + (rows * square_grid_length) + (square_grid_length / 3)), square_grid_length))
+    np.arange(min_y, (upper_y_bound + (square_grid_length / 3)), square_grid_length))
 
 print("column points: ", col_points)
 print("row points: ", row_points)
 
-# print(f"rows: {rows}, cols: {cols}")
-#
-# test_bound = bounds[0]
-# for i in range(0, rows):
-#     if i == 0:
-#         print(test_bound)
-#         continue
-#     test_bound += square_grid_length
-#     print(test_bound)
+# To draw initial purple patch: calculate the rectangular grid length & width
+max_y_length = abs(abs(upper_y_bound) - abs(min_y))
+max_x_length = abs(abs(upper_x_bound) - abs(min_x))
 
-# To draw initial purple patch size,calculate the rectangular grid length & width
-# max_y_length = Point(0, bounds[1]).distance(Point(0, bounds[3]))
-# max_x_length = Point(bounds[0], 0).distance(Point(bounds[2], 0))
-# TODO: The given cordinate is not a perfect square
-# max_y_length = abs(abs(bounds[3]) - abs(bounds[1]))
-# max_x_length = abs(abs(bounds[2]) - abs(bounds[0]))
-
-max_y_length = abs(abs((bounds[1] + (rows * square_grid_length))) - abs(bounds[1]))
-max_x_length = abs(abs((bounds[0] + (cols * square_grid_length))) - abs(bounds[0]))
-
-# For visualization:Create a figure with all the data stored in "figure directory"
+# For visualization: Generate a figure with all the data shown
 # crime_data.geometry.plot(ax=ax)
 fig1 = plt.figure(1)
 ax = fig1.add_subplot(1, 1, 1)
 
+# To view the plot easily: Set axis bounds with buffer around edges
+plt.axis([(min(x) - grid_buffer), (max(x) + grid_buffer), (min(y) - grid_buffer), (max(y) + grid_buffer)])
+
 rect_initial = patches.Rectangle((min(x), min(y)), max_x_length, max_y_length, color="purple")
 ax.add_patch(rect_initial)
 
-# Figure axis bounds
-plt.axis([(min(x) - grid_buffer), (max(x) + grid_buffer), (min(y) - grid_buffer), (max(y) + grid_buffer)])
-
-# Plot points
+# To view the data: Plot points
 plt.plot(x, y, "o")
 
-# Drawing grids
+# To view the grids: Drawing lines vertical and horizontal
 for i in col_points:
     plt.axvline(x=i)
 for i in row_points:
@@ -110,12 +106,13 @@ for i in row_points:
 # plt.plot(start_point, end_point)
 
 
-# Add rectanges for visualization
-
+# To visualize high risk grids: Add yellow rectangles
 rect_high_risk = patches.Rectangle((min(x), min(y)), square_grid_length, square_grid_length, color="red")
 ax.add_patch(rect_high_risk)
 
-rect_high_risk = patches.Rectangle((min(x), min(y)), square_grid_length, square_grid_length, color="yellow")
+risky_grid = (min(x), min(y))
+
+rect_high_risk = patches.Rectangle(risky_grid, square_grid_length, square_grid_length, color="yellow")
 ax.add_patch(rect_high_risk)
 
 # Display plot
