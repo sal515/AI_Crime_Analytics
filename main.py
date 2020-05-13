@@ -105,6 +105,28 @@ for i in row_points:
 # end_point = [col_points[3], row_points[(row_points.__len__() - 1)]]
 # plt.plot(start_point, end_point)
 
+# To create crime rate matrix: Calculate the axis offsets
+x_axis_offset = 0 - min_x
+y_axis_offset = 0 - min_y
+
+# To create crime rate matrix: Calculate offset values of x and y
+# x_offset = list(map(lambda x_val: x_val + x_axis_offset, x))
+# y_offset = list(map(lambda y_val: y_val + y_axis_offset, y))
+# Or using numpy to get the same effect
+x_offset = np.array(x) + x_axis_offset
+y_offset = np.array(y) + y_axis_offset
+
+# To create crime rate matrix: Identify the grids corresponding to x&y
+grid_row = np.array(x_offset // square_grid_length, dtype=int)
+grid_col = np.array(y_offset // square_grid_length, dtype=int)
+
+# To create crime rate matrix: Calculate matrix size and generate empty matrix
+cr_mat_sz = rows * cols
+cr_matrix = np.zeros(cr_mat_sz)
+
+# Updating crime matrix with number of crimes occurred corresponding to grids
+
+
 
 # To visualize high risk grids: Add yellow rectangles
 rect_high_risk = patches.Rectangle((min(x), min(y)), square_grid_length, square_grid_length, color="red")
