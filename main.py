@@ -13,7 +13,7 @@ import math
 def iterate_cr_matrix(cr_matrix, rows, cols):
     for m in range(0, rows):
         for n in range(0, cols):
-            print(cr_matrix[m, n], end="    ")
+            print(cr_matrix[m, n], end="  ")
         print(" ")
 
 
@@ -135,7 +135,7 @@ grid_col = np.array(y_offset // square_grid_length, dtype=int)
 
 # To create crime rate matrix: Calculate matrix size and generate empty matrix
 cr_mat_sz = rows * cols
-cr_matrix = np.zeros(cr_mat_sz, dtype=int)
+cr_array = np.zeros(cr_mat_sz, dtype=int)
 
 # Updating crime matrix with number of crimes occurred corresponding to grids
 grid_row_sz = grid_row.__len__()
@@ -144,23 +144,27 @@ if grid_row_sz != grid_col_sz:
     print("Quit, Something went wrong with the coordinates")
     quit(-1)
 
+# for i in range(grid_row_sz - 1, 0 - 1, -1):
+#     index = (grid_row[i] * rows) + grid_col[i]
+#     cr_matrix[index] += 1
 for i in range(0, grid_row_sz):
-    # index = (grid_row[i] * rows) + grid_col[i]
-    index = (grid_col[i] * cols) + grid_row[i]
-    cr_matrix[index] += 1
+    index = (grid_col[i] * rows) + grid_row[i]
+    cr_array[index] += 1
 
-print(cr_matrix)
+print(cr_array)
 
 # Visualize updated matrix of crime rates
-# print("not flipped")
-# print((cr_matrix.reshape(rows, cols)).view(type=np.matrix))
+print("not flipped")
+cr_matrix = (cr_array.reshape(rows, cols))
+print(cr_matrix)
 print("flipped to match grid")
-cr_matrix_flipped = np.flipud(cr_matrix.reshape(rows, cols)).view(type=np.matrix)
+cr_matrix_flipped = np.flipud(cr_array.reshape(rows, cols))
 print(cr_matrix_flipped)
 
 # Test grid counts
-
 iterate_cr_matrix(cr_matrix_flipped, rows, cols)
+
+# updated_Mat = (np.flipud(cr_matrix.reshape(rows, cols)).view(type=np.matrix))
 
 # To visualize high risk grids: Add yellow rectangles
 rect_high_risk = patches.Rectangle((min(x), min(y)), square_grid_length, square_grid_length, color="red")
