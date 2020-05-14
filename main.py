@@ -10,6 +10,13 @@
 import math
 
 
+def iterate_cr_matrix(cr_matrix, rows, cols):
+    for m in range(0, rows):
+        for n in range(0, cols):
+            print(cr_matrix[m, n], end="    ")
+        print(" ")
+
+
 def save_figure(plt, figureName):
     plt.savefig("".join([figures_dir_path, figureName]))
 
@@ -23,6 +30,7 @@ from shapely.geometry import Polygon as polygon
 from shapely.geometry import MultiPoint
 from shapely.geometry import Point
 import numpy as np
+from functools import reduce
 
 # ====== user input variables ======
 square_grid_length = 0.002
@@ -36,11 +44,16 @@ figures_dir_path = "figures\\"
 
 # Read shape file using geopanda as a dataframe
 crime_data = geopandas.read_file(shapes_data_path)
+# To save crime data as CSV format to read the data
+# crime_data.to_csv("".join([figures_dir_path, "crime_data.csv"]), index=True)
 
 # Extract all the points from the data frame as a list of points
 x_y_pair = list(map(lambda point: list(point.coords)[0], crime_data.geometry))
 x = list(map(lambda point: point[0], x_y_pair))
 y = list(map(lambda point: point[1], x_y_pair))
+# To save coordinate data as CSV format to read the data
+# output = np.column_stack((np.array(x).flatten(), np.array(y).flatten()))
+# np.savetxt("".join([figures_dir_path, "output.csv"]), output, delimiter=",")
 
 # To draw the grids: identifying the bounds of the given data
 # By creating a polygon using all the crime data points
@@ -90,16 +103,16 @@ rect_initial = patches.Rectangle((min(x), min(y)), max_x_length, max_y_length, c
 ax.add_patch(rect_initial)
 
 # To view the data: Plot points
-plt.plot(x, y, "o")
+plt.plot(x, y, ".")
 
 # To view the grids: Drawing lines vertical and horizontal
 for i in col_points:
     plt.axvline(x=i)
 for i in row_points:
     plt.axhline(y=i)
-
 # TODO: figure out why lambda doesn't work
 # map(lambda col: plt.axvline(x=col), col_points)
+
 # FIXME: Fix the grid lines to span only on the data points area
 # start_point = [col_points[3], row_points[0]]
 # end_point = [col_points[3], row_points[(row_points.__len__() - 1)]]
@@ -116,17 +129,38 @@ y_axis_offset = 0 - min_y
 x_offset = np.array(x) + x_axis_offset
 y_offset = np.array(y) + y_axis_offset
 
-# To create crime rate matrix: Identify the grids corresponding to x&y
+# To create crime rate matrix: Identify the crime coord. to corresponding grids
 grid_row = np.array(x_offset // square_grid_length, dtype=int)
 grid_col = np.array(y_offset // square_grid_length, dtype=int)
 
 # To create crime rate matrix: Calculate matrix size and generate empty matrix
 cr_mat_sz = rows * cols
-cr_matrix = np.zeros(cr_mat_sz)
+cr_matrix = np.zeros(cr_mat_sz, dtype=int)
 
 # Updating crime matrix with number of crimes occurred corresponding to grids
+grid_row_sz = grid_row.__len__()
+grid_col_sz = grid_col.__len__()
+if grid_row_sz != grid_col_sz:
+    print("Quit, Something went wrong with the coordinates")
+    quit(-1)
 
+for i in range(0, grid_row_sz):
+    # index = (grid_row[i] * rows) + grid_col[i]
+    index = (grid_col[i] * cols) + grid_row[i]
+    cr_matrix[index] += 1
 
+print(cr_matrix)
+
+# Visualize updated matrix of crime rates
+# print("not flipped")
+# print((cr_matrix.reshape(rows, cols)).view(type=np.matrix))
+print("flipped to match grid")
+cr_matrix_flipped = np.flipud(cr_matrix.reshape(rows, cols)).view(type=np.matrix)
+print(cr_matrix_flipped)
+
+# Test grid counts
+
+iterate_cr_matrix(cr_matrix_flipped, rows, cols)
 
 # To visualize high risk grids: Add yellow rectangles
 rect_high_risk = patches.Rectangle((min(x), min(y)), square_grid_length, square_grid_length, color="red")
