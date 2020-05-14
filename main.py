@@ -36,6 +36,8 @@ from functools import reduce
 square_grid_length = 0.002
 grid_buffer = square_grid_length * 2
 
+threshold = 50
+
 # ====== constant path variables ======
 shapes_data_path = "data\\Shape\\crime_dt.shp"
 figures_dir_path = "figures\\"
@@ -135,7 +137,7 @@ grid_col = np.array(y_offset // square_grid_length, dtype=int)
 
 # To create crime rate matrix: Calculate matrix size and generate empty matrix
 cr_mat_sz = rows * cols
-cr_array = np.zeros(cr_mat_sz, dtype=int)
+cr_arr = np.zeros(cr_mat_sz, dtype=int)
 
 # Updating crime matrix with number of crimes occurred corresponding to grids
 grid_row_sz = grid_row.__len__()
@@ -149,22 +151,60 @@ if grid_row_sz != grid_col_sz:
 #     cr_matrix[index] += 1
 for i in range(0, grid_row_sz):
     index = (grid_col[i] * rows) + grid_row[i]
-    cr_array[index] += 1
+    cr_arr[index] += 1
 
-print(cr_array)
+print(cr_arr)
 
 # Visualize updated matrix of crime rates
 print("not flipped")
-cr_matrix = (cr_array.reshape(rows, cols))
+cr_matrix = (cr_arr.reshape(rows, cols))
 print(cr_matrix)
 print("flipped to match grid")
-cr_matrix_flipped = np.flipud(cr_array.reshape(rows, cols))
+cr_matrix_flipped = np.flipud(cr_arr.reshape(rows, cols))
 print(cr_matrix_flipped)
 
 # Test grid counts
 iterate_cr_matrix(cr_matrix_flipped, rows, cols)
 
 # updated_Mat = (np.flipud(cr_matrix.reshape(rows, cols)).view(type=np.matrix))
+
+# Sort crime array for threshold in descending order
+cr_arr_sorted = np.sort(cr_arr)[::-1]
+print(cr_arr_sorted)
+
+# Calculating crime statistics
+median = np.median(cr_arr_sorted)
+average = np.average(cr_arr_sorted)
+std_dev = np.std(cr_arr_sorted)
+
+print("Median ", median)
+print("Average ", average)
+print("Standard Deviation ", std_dev)
+
+# Updating blocked and non-blocked areas on matrix
+obstacles_arr = cr_arr.copy()
+threshold_val = 0
+
+if threshold == 50:
+    threshold_val = median
+else:
+    max_blocked_index = math.floor((rows * cols) * (1 - (threshold / 100)))
+
+    max_blocked_index = 1 if (max_blocked_index <= 0) else max_blocked_index
+
+    threshold_val = cr_arr_sorted[max_blocked_index-1]
+
+    threshold_val = max(cr_arr_sorted)+1 if (threshold == 100) else threshold_val
+
+for i in range(0, obstacles_arr.__len__()):
+    if obstacles_arr[i] >= threshold_val:
+        # Blocked
+        obstacles_arr[i] = 0
+    else:
+        # Open
+        obstacles_arr[i] = 1
+
+print(obstacles_arr)
 
 # To visualize high risk grids: Add yellow rectangles
 rect_high_risk = patches.Rectangle((min(x), min(y)), square_grid_length, square_grid_length, color="red")
