@@ -183,7 +183,7 @@ print("Standard Deviation ", std_dev)
 
 # Updating blocked and non-blocked areas on matrix
 obstacles_arr = cr_arr.copy()
-threshold_val = 0
+# threshold_val = 0
 
 if threshold == 50:
     threshold_val = median
@@ -192,9 +192,9 @@ else:
 
     max_blocked_index = 1 if (max_blocked_index <= 0) else max_blocked_index
 
-    threshold_val = cr_arr_sorted[max_blocked_index-1]
+    threshold_val = cr_arr_sorted[max_blocked_index - 1]
 
-    threshold_val = max(cr_arr_sorted)+1 if (threshold == 100) else threshold_val
+    threshold_val = max(cr_arr_sorted) + 1 if (threshold == 100) else threshold_val
 
 for i in range(0, obstacles_arr.__len__()):
     if obstacles_arr[i] >= threshold_val:
