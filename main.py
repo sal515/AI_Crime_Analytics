@@ -223,6 +223,10 @@ for index in range(0, obstacles_arr.__len__()):
     draw_blocked_grid(obstacles_arr[index], index, cols, min(x), min(y), square_grid_length, ax)
 
 # Display plot
+plt.xlabel("Longitude")
+plt.ylabel("Latitude")
+plt.title(f"Crime rate plot : {threshold}% threshold")
+# plt.legend()
 save_figure(plt, "all_crime_data.png")
 plt.show()
 
