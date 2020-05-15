@@ -8,6 +8,19 @@
 # TODO: Move functions to separate package
 # ====== functions ======
 
+
+def draw_blocked_grid(isOpen, index, cols, minx, miny, square_grid_length, ax, color="yellow"):
+    if isOpen:
+        return
+
+    row_col = to_row_col(index, cols)
+
+    risky_grid = (min(x) + row_col[1] * square_grid_length, min(y) + row_col[0] * square_grid_length)
+
+    rect_high_risk = patches.Rectangle(risky_grid, square_grid_length, square_grid_length, color=color)
+    ax.add_patch(rect_high_risk)
+
+
 def to_index(row, col, cols):
     return (row * cols) + col
 
@@ -44,6 +57,7 @@ square_grid_length = 0.002
 grid_buffer = square_grid_length * 2
 
 threshold = 50
+# threshold = 20
 
 # ====== constant path variables ======
 shapes_data_path = "data\\Shape\\crime_dt.shp"
@@ -157,13 +171,13 @@ for i in range(0, grid_row.__len__()):
 
 print(cr_arr)
 
-# Visualize updated matrix of crime rates
-print("not flipped")
-cr_matrix = (cr_arr.reshape(rows, cols))
-print(cr_matrix)
-print("flipped to match grid")
-cr_matrix_flipped = np.flipud(cr_arr.reshape(rows, cols))
+# # Visualize updated matrix of crime rates
+print("Doesn't match grids")
+cr_matrix_flipped = (cr_arr.reshape(rows, cols))
 print(cr_matrix_flipped)
+print("Matches grids")
+cr_matrix = np.flipud(cr_arr.reshape(rows, cols))
+print(cr_matrix)
 
 # Test grid counts
 # iterate_cr_matrix(cr_matrix, rows, cols)
@@ -204,14 +218,9 @@ for i in range(0, obstacles_arr.__len__()):
 
 print(obstacles_arr)
 
-# To visualize high risk grids: Add yellow rectangles
-rect_high_risk = patches.Rectangle((min(x), min(y)), square_grid_length, square_grid_length, color="red")
-ax.add_patch(rect_high_risk)
-
-risky_grid = (min(x), min(y))
-
-rect_high_risk = patches.Rectangle(risky_grid, square_grid_length, square_grid_length, color="yellow")
-ax.add_patch(rect_high_risk)
+# Draw blocked cells: By looping through crime matrix array and draw squares
+for index in range(0, obstacles_arr.__len__()):
+    draw_blocked_grid(obstacles_arr[index], index, cols, min(x), min(y), square_grid_length, ax)
 
 # Display plot
 save_figure(plt, "all_crime_data.png")
