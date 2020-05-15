@@ -7,7 +7,13 @@
 
 # TODO: Move functions to separate package
 # ====== functions ======
-import math
+
+def to_index(row, col, cols):
+    return (row * cols) + col
+
+
+def to_row_col(index, cols):
+    return divmod(index, cols)
 
 
 def iterate_cr_matrix(cr_matrix, rows, cols):
@@ -31,6 +37,7 @@ from shapely.geometry import MultiPoint
 from shapely.geometry import Point
 import numpy as np
 from functools import reduce
+import math
 
 # ====== user input variables ======
 square_grid_length = 0.002
@@ -70,6 +77,7 @@ print(f"bounds: (minx:{min_x}, miny:{min_y}, maxx:{max_x}, maxy:{max_y}) ")
 # print("bounds: (minx-0, miny-1, maxx-2, maxy-3) ", bounds)
 
 # To draw the grids: calculating required rows and cols
+# rows -> are y and cols are x
 cols = int(math.ceil(abs(abs(max_x) - abs(min_x)) / square_grid_length))
 rows = int(math.ceil(abs(abs(max_y) - abs(min_y)) / square_grid_length))
 
@@ -121,37 +129,31 @@ for i in row_points:
 # plt.plot(start_point, end_point)
 
 # To create crime rate matrix: Calculate the axis offsets
-x_axis_offset = 0 - min_x
-y_axis_offset = 0 - min_y
+x_offset = 0 - min_x
+y_offset = 0 - min_y
 
 # To create crime rate matrix: Calculate offset values of x and y
 # x_offset = list(map(lambda x_val: x_val + x_axis_offset, x))
 # y_offset = list(map(lambda y_val: y_val + y_axis_offset, y))
 # Or using numpy to get the same effect
-x_offset = np.array(x) + x_axis_offset
-y_offset = np.array(y) + y_axis_offset
+x_normalized = np.array(x) + x_offset
+y_normalized = np.array(y) + y_offset
 
 # To create crime rate matrix: Identify the crime coord. to corresponding grids
-grid_row = np.array(x_offset // square_grid_length, dtype=int)
-grid_col = np.array(y_offset // square_grid_length, dtype=int)
+grid_col = np.array(x_normalized // square_grid_length, dtype=int)
+grid_row = np.array(y_normalized // square_grid_length, dtype=int)
 
 # To create crime rate matrix: Calculate matrix size and generate empty matrix
 cr_mat_sz = rows * cols
 cr_arr = np.zeros(cr_mat_sz, dtype=int)
 
 # Updating crime matrix with number of crimes occurred corresponding to grids
-grid_row_sz = grid_row.__len__()
-grid_col_sz = grid_col.__len__()
-if grid_row_sz != grid_col_sz:
+if grid_col.__len__() != grid_row.__len__():
     print("Quit, Something went wrong with the coordinates")
     quit(-1)
 
-# for i in range(grid_row_sz - 1, 0 - 1, -1):
-#     index = (grid_row[i] * rows) + grid_col[i]
-#     cr_matrix[index] += 1
-for i in range(0, grid_row_sz):
-    index = (grid_col[i] * rows) + grid_row[i]
-    cr_arr[index] += 1
+for i in range(0, grid_row.__len__()):
+    cr_arr[to_index(grid_row[i], grid_col[i], cols)] += 1
 
 print(cr_arr)
 
@@ -164,9 +166,7 @@ cr_matrix_flipped = np.flipud(cr_arr.reshape(rows, cols))
 print(cr_matrix_flipped)
 
 # Test grid counts
-iterate_cr_matrix(cr_matrix_flipped, rows, cols)
-
-# updated_Mat = (np.flipud(cr_matrix.reshape(rows, cols)).view(type=np.matrix))
+# iterate_cr_matrix(cr_matrix, rows, cols)
 
 # Sort crime array for threshold in descending order
 cr_arr_sorted = np.sort(cr_arr)[::-1]
@@ -183,13 +183,11 @@ print("Standard Deviation ", std_dev)
 
 # Updating blocked and non-blocked areas on matrix
 obstacles_arr = cr_arr.copy()
-# threshold_val = 0
 
 if threshold == 50:
     threshold_val = median
 else:
     max_blocked_index = math.floor((rows * cols) * (1 - (threshold / 100)))
-
     max_blocked_index = 1 if (max_blocked_index <= 0) else max_blocked_index
 
     threshold_val = cr_arr_sorted[max_blocked_index - 1]
