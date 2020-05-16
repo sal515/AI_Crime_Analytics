@@ -30,6 +30,7 @@ data.calculate_statistics()
 data.update_obstacles_arr()
 
 # Print data
+# FIXME: The outputs needs to be cleaned up and easy to read
 data.print()
 
 # Visualize

@@ -171,3 +171,15 @@ class data:
         print("Average ", self.average)
         print("Standard Deviation ", self.std_dev)
         print("Obstacles array ", self.obstacles_arr)
+
+    # def test_obstacles_arr(self, test_np_list: np.ndarray, threshold):
+    #     self.crime_rate_arr = test_np_list
+    #     self.threshold = threshold
+    #     self.number_of_grids = test_np_list.__len__()
+    #     self.update_obstacles_arr()
+    #     print(list(self.crime_rate_arr))
+    #     print(list(self.obstacles_arr))
+    #
+    #     # run
+    #     # import numpy as np
+    #     # data.test_obstacles_arr(np.array([10, 9, 9, 9, 9, 4, 4, 4, 2, 2, 1]), 80)
