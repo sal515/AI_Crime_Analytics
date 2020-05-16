@@ -67,7 +67,8 @@ class data:
         self.grid_row = np.array(self.y_normalized // self.square_grid_length, dtype=int)
 
         # To create crime rate matrix: Calculate matrix size and generate empty matrix
-        self.crime_rate_arr = np.zeros(self.rows * self.cols, dtype=int)
+        self.number_of_grids = self.rows * self.cols
+        self.crime_rate_arr = np.zeros(self.number_of_grids, dtype=int)
 
         # Sorted crime rate array to determine threshold
         self.crime_rate_arr_sorted = None
@@ -78,6 +79,7 @@ class data:
         self.std_dev = None
 
         # Obstacles array identifies the blocked and non-blocked grids
+        self.threshold_val = None
         self.obstacles_arr = None
 
         # FIXME: Fix the data storing as file functions
@@ -110,19 +112,22 @@ class data:
 
     # Updating blocked and non-blocked areas on matrix
     def update_obstacles_arr(self):
+        self.sort_crime_data_arr()
+        self.median = np.median(self.crime_rate_arr_sorted)
         self.obstacles_arr = self.crime_rate_arr.copy()
 
         if self.threshold == 50:
-            threshold_val = self.median
+            self.threshold_val = self.median
         else:
-            max_blocked_index = math.floor((self.rows * self.cols) * (1 - (self.threshold / 100)))
+            max_blocked_index = math.floor(self.number_of_grids * (1 - (self.threshold / 100)))
             max_blocked_index = 1 if (max_blocked_index <= 0) else max_blocked_index
 
-            threshold_val = self.crime_rate_arr_sorted[max_blocked_index - 1]
+            self.threshold_val = self.crime_rate_arr_sorted[max_blocked_index - 1]
 
-            threshold_val = max(self.crime_rate_arr_sorted) + 1 if (self.threshold == 100) else threshold_val
+            self.threshold_val = max(self.crime_rate_arr_sorted) + 1 if (self.threshold == 100) else self.threshold_val
+
         for i in range(0, self.obstacles_arr.__len__()):
-            if self.obstacles_arr[i] >= threshold_val:
+            if self.obstacles_arr[i] >= self.threshold_val:
                 # Blocked
                 self.obstacles_arr[i] = 0
             else:
