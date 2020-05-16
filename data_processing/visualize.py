@@ -7,6 +7,7 @@ class visualize:
     def __init__(self) -> None:
         # super().__init__()
         pass
+
     # Plotting the figure
     def plot_show(self, plt, threshold):
         plt.xlabel("Longitude")
@@ -48,7 +49,6 @@ class visualize:
         rect_initial = patches.Rectangle(origin_point, data.max_x_length, data.max_y_length, color=color)
         ax.add_patch(rect_initial)
 
-
     # To view the grids: Drawing lines vertical and horizontal
     def draw_grids(self, plt, data):
         for i in data.col_points:
@@ -65,22 +65,4 @@ class visualize:
         # plt.plot(start_point, end_point)
 
     def save_figure(self, plt, figureName, figures_dir_path):
-    plt.savefig("".join([figures_dir_path, figureName]))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        plt.savefig("".join([figures_dir_path, figureName]))
