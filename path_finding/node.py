@@ -1,12 +1,12 @@
 import math
 from functools import total_ordering
 
+
 # @total_ordering
 class node:
 
     def __init__(self, parent, destination, position) -> None:
         self.parent = parent
-        # self.destination = destination
         self.position = position
 
         self.g = 0
@@ -24,11 +24,5 @@ class node:
     def __eq__(self, other):
         return self.position == other.position
 
-    # def __lt__(self, other):
-    #     return self.f < other.f
-
     def __hash__(self):
-        if self.parent is not None:
-            return hash(hash(self.position) + hash(self.parent))
-
         return hash(self.position)
