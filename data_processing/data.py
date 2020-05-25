@@ -142,6 +142,10 @@ class data:
     def crime_rate_matrix(self):
         return self.crime_rate_arr.reshape(self.rows, self.cols)
 
+    # Visualize Obstacles Matrix
+    def obstacle_matrix(self):
+        return self.obstacles_arr.reshape(self.rows, self.cols)
+
     # This functions helps to get the crime rate array index using row, col convention
     def to_index(self, row, col, cols):
         return (row * cols) + col
@@ -171,6 +175,7 @@ class data:
         print("Average ", self.average)
         print("Standard Deviation ", self.std_dev)
         print("Obstacles array ", self.obstacles_arr)
+        print("Obstacles Matrix ", self.obstacle_matrix())
 
     # def test_obstacles_arr(self, test_np_list: np.ndarray, threshold):
     #     self.crime_rate_arr = test_np_list
