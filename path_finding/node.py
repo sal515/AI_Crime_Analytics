@@ -7,6 +7,7 @@ class node:
 
     def __init__(self, parent, destination, position) -> None:
         self.parent = parent
+        self.destination = destination
         self.position = position
 
         self.g = 0
@@ -17,7 +18,7 @@ class node:
             self.g = self.parent.g + 1
 
             self.h = math.sqrt(
-                pow((destination[1] - self.position[1]), 2) + pow((destination[0] - self.position[0]), 2))
+                pow((self.destination.position[1] - self.position[1]), 2) + pow((self.destination.position[0] - self.position[0]), 2))
 
             self.f = self.g + self.h
 
