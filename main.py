@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 
 import data_processing.data as dt
 import data_processing.visualize as visualize
+from path_finding.a_star_algo import aStar
 
 # ====== user input variables ======
 square_grid_length = 0.002
@@ -29,6 +30,16 @@ data.sort_crime_data_arr()
 data.calculate_statistics()
 data.update_obstacles_arr()
 
+# FIXME
+# call astar
+start = (8, 2)
+destination = (6, 8)
+aStar = aStar(start, destination, data.obstacles_arr, data)
+path = aStar.run()
+
+# call path_to_coordinate_func
+import matplotlib.patches as patch
+
 # Print data
 # FIXME: The outputs needs to be cleaned up and easy to read
 data.print()
@@ -38,10 +49,26 @@ fig1 = plt.figure(1)
 ax = fig1.add_subplot(1, 1, 1)
 
 visualize = visualize.visualize()
-visualize.plot_crime_coordinates(plt, data)
+# visualize.plot_crime_coordinates(plt, data)
 visualize.draw_initial_patch(plt, ax, data, grid_buffer)
 visualize.draw_grids(plt, data)
 visualize.draw_all_blocked_grids(data, ax)
+
+# FIXME
+# visualize.draw_counts_on_plot(ax, data)
+# visualize astar path (ax, data, path)
+
+# ax.add_patch(
+#     patch.ConnectionPatch((data.min_x + 0 * data.square_grid_length, data.min_y + data.square_grid_length * 0),
+#                           (data.min_x + 5 * data.square_grid_length, data.min_y + data.square_grid_length * 3),
+#                           "data", "data", arrowstyle="-|>", shrinkA=1, shrinkB=1,
+#                           dpi_cor=30, color="blue", linewidth="2"))
+
+
+for node in path:
+    ax.add_patch(
+        patch.ConnectionPatch(data.to_coordinate(node.parent.position), data.to_coordinate(node.position), "data", "data", arrowstyle="-|>", shrinkA=1, shrinkB=1, dpi_cor=30, color="blue", linewidth="2"))
+
 visualize.save_figure(plt, "all_crime_data.png", figures_dir_path)
 visualize.plot_show(plt, threshold)
 

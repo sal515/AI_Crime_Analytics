@@ -154,6 +154,11 @@ class data:
     def to_row_col(self, index, cols):
         return divmod(index, cols)
 
+    def to_coordinate(self, row_col: tuple):
+        row_coord = (self.lower_x_bound + row_col[1] * self.square_grid_length)
+        col_coord = (self.lower_y_bound + row_col[0] * self.square_grid_length)
+        return row_coord, col_coord
+
     # view the crime rate array as a matrix
     def iterate_crime_rate_matrix(self, cr_matrix, rows, cols):
         for m in range(0, rows):

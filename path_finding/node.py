@@ -18,7 +18,8 @@ class node:
             self.g = self.parent.g + 1
 
             self.h = math.sqrt(
-                pow((self.destination.position[1] - self.position[1]), 2) + pow((self.destination.position[0] - self.position[0]), 2))
+                pow((self.destination.position[1] - self.position[1]), 2) + pow(
+                    (self.destination.position[0] - self.position[0]), 2))
 
             self.f = self.g + self.h
 
@@ -27,3 +28,6 @@ class node:
 
     def __hash__(self):
         return hash(self.position)
+
+    def __repr__(self) -> str:
+        return f"==> parent: {self.parent}, destination: {self.destination}, position: {self.position} <== \n"

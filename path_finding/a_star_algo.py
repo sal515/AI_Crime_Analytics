@@ -25,8 +25,10 @@ class aStar:
         self.data = data
         self.rows = data.rows
         self.cols = data.cols
+
         # assuming the boundary is of a square or rectangle
         self.forbidden_nodes = (self.rows * 2 + self.cols * 2) - 4
+        self.forbidden_nodes_dict = {}
 
         self.obstacle_array = obstacles_array
         self.start: node = node(parent=None, destination=destination, position=start)
@@ -44,6 +46,8 @@ class aStar:
             # get current node from openList with lowest f
             # remove the current node from the open list & dict
             current_node: node = pq_helper.pop_node(self.open_priority_queue, self.open_dict)
+
+            # FIXME
             # add the current node to the closed list & dict
             self.update_closed_list(current_node)
 
@@ -59,6 +63,11 @@ class aStar:
                 adjacent_node = self.get_adjacent_node(current_node, possible_node)
                 adjacent_node_key = str(hash(adjacent_node))
 
+                # FIXME: Check if the node is within range
+                # FIXME: Check if the node is blocked or not
+                if str(hash(adjacent_node)) in self.forbidden_nodes_dict:
+                    continue
+
                 if adjacent_node_key in self.closed_dict:
                     continue
 
@@ -68,37 +77,27 @@ class aStar:
                         if adjacent_node.g > node_entry[2].g:
                             continue
 
-                    # nodes_list = self.open_dict[adjacent_node_key]
-                    # if len(nodes_list) < 2:
-                    #     if adjacent_node.g > nodes_list[0][2].g:
-                    #         continue
-
-                    # index = itertools.count()
-                    # # nodes_list = self.open_dict[adjacent_node_key]
-                    # for node_entry in self.open_dict[adjacent_node_key]:
-                    #     i = next(index)
-                    #     if node_entry[0] == ad:
-
-                    # ((adjacent_node.g > self.open_dict[adjacent_node_key].g) or (
-                    # adjacent_node.g == self.open_dict[adjacent_node_key].g)):
-
                 pq_helper.add_node(adjacent_node, self.open_priority_queue, self.open_dict)
 
     # === Helper functions ===
 
     def update_forbidden_nodes(self):
-        for r in (0, self.rows - 1):
-            for c in range(0, self.cols - 1):
+        for r in (0, self.rows-1):
+            for c in range(0, self.cols):
                 # self.obstacle_array[self.data.to_index(r,c,self.cols)]
-                self.update_closed_list(node(None, None, (r, c)))
-        for c in (0, self.cols - 1):
-            for r in range(0, self.rows - 1):
+                # self.update_closed_list(node(None, None, (r, c)))
+                self.forbidden_nodes_dict[str(hash(node(None, None, (r, c))))] = (r,c)
+
+        for c in (0, self.cols-1):
+            for r in range(0, self.rows):
                 # self.obstacle_array[self.data.to_index(r,c,self.cols)]
-                self.update_closed_list(node(None, None, (r, c)))
-        blocked_grids_r_c = [self.data.to_row_col(i, self.data.cols) for i in range(len(self.obstacle_array)) if
-                             self.obstacle_array[i] == 0]
+                # self.update_closed_list(node(None, None, (r, c)))
+                self.forbidden_nodes_dict[str(hash(node(None, None, (r, c))))] = (r,c)
+
+        blocked_grids_r_c = [self.data.to_row_col(i, self.data.cols) for i in range(len(self.obstacle_array)) if self.obstacle_array[i] == 0]
         for r_c in blocked_grids_r_c:
-            self.update_closed_list(node(None, None, r_c))
+            # self.update_closed_list(node(None, None, r_c))
+            self.forbidden_nodes_dict[str(hash(node(None, None, r_c)))] = r_c
 
     def update_closed_list(self, current_node):
         current_node_key = str(hash(current_node))
