@@ -2,6 +2,7 @@ import geopandas
 import numpy as np
 import math
 from functools import reduce
+from collections.abc import Iterable
 
 
 class data:
@@ -55,16 +56,8 @@ class data:
         self.x_offset = 0 - self.min_x
         self.y_offset = 0 - self.min_y
 
-        # To create crime rate matrix: Calculate offset values of x and y
-        self.x_normalized = np.array(self.x) + self.x_offset
-        self.y_normalized = np.array(self.y) + self.y_offset
-        # Or using numpy to get the same effect
-        # x_offset = list(map(lambda x_val: x_val + x_axis_offset, x))
-        # y_offset = list(map(lambda y_val: y_val + y_axis_offset, y))
-
-        # To create crime rate matrix: Identify the crime coord. to corresponding grids
-        self.grid_col = np.array(self.x_normalized // self.square_grid_length, dtype=int)
-        self.grid_row = np.array(self.y_normalized // self.square_grid_length, dtype=int)
+        # To create crime rate matrix: Calculate offset values of x and y and identify the crime coord. to corresponding grids
+        self.grid_row, self.grid_col = self.to_row_col_from_coord(self.x, self.y)
 
         # To create crime rate matrix: Calculate matrix size and generate empty matrix
         self.number_of_grids = self.rows * self.cols
@@ -151,8 +144,27 @@ class data:
         return (row * cols) + col
 
     # This functions helps to get the row, col from a given index of the crime rate matrix array
-    def to_row_col(self, index, cols):
+    def to_row_col_from_index(self, index, cols):
         return divmod(index, cols)
+
+    # To create crime rate matrix: Calculate offset values of x and y and identify the crime coord. to corresponding grids
+    def to_row_col_from_coord(self, x, y):
+        if isinstance(x, Iterable) and isinstance(y, Iterable):
+            x_normalized = np.array(x) + self.x_offset
+            y_normalized = np.array(y) + self.y_offset
+            # Or using numpy to get the same effect
+            # x_offset = list(map(lambda x_val: x_val + x_axis_offset, x))
+            # y_offset = list(map(lambda y_val: y_val + y_axis_offset, y))
+            grid_col = np.array(x_normalized // self.square_grid_length, dtype=int)
+            grid_row = np.array(y_normalized // self.square_grid_length, dtype=int)
+
+            return grid_row, grid_col
+
+        x_normalized = x + self.x_offset
+        y_normalized = y + self.y_offset
+        grid_col = x_normalized // self.square_grid_length
+        grid_row = y_normalized // self.square_grid_length
+        return grid_row, grid_col
 
     def to_coordinate(self, row_col: tuple):
         row_coord = (self.lower_x_bound + row_col[1] * self.square_grid_length)
