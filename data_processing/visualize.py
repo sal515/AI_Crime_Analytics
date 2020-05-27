@@ -26,7 +26,7 @@ class visualize:
         if isOpen:
             return
 
-        row_col = data.to_row_col(index, data.cols)
+        row_col = data.to_row_col_from_index(index, data.cols)
 
         risky_grid = (
             data.min_x + row_col[1] * data.square_grid_length, data.min_y + row_col[0] * data.square_grid_length)
