@@ -90,8 +90,10 @@ class vertex:
     def __eq__(self, other):
         if self.node_a is None and other.node_a is None:
             return self.node_b == other.node_b
+
         elif self.node_a is None and other.node_a is not None:
             return False
+
         elif self.node_a is not None and other.node_a is None:
             return False
 

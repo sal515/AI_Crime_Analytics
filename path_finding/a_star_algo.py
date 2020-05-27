@@ -1,6 +1,6 @@
 import itertools
-from numpy import inf
 import queue as q
+from numpy import inf
 from collections import defaultdict
 
 from path_finding.node import node
@@ -12,38 +12,41 @@ from data_processing.data import data as dt
 class aStar:
 
     def __init__(self, start_xy: tuple, destination_xy: tuple, obstacles_array: [], data: dt) -> None:
-        # eg.
-        # start -> node(None,None,  (0,0))
-        # destination -> node(None, None, (9,3))
+        self.data = data
+        self.obstacle_array = obstacles_array
 
         # TODO: CHECK if needed
+        # Path from vertices from start to destination
         self.path = []
 
-        self.open_priority_queue = q.PriorityQueue(-1)
         # FIXME: Check anything related to the open dict and duplicate keys
+        # Get the lowest f value for next vertex using priority queue
+        self.open_priority_queue = q.PriorityQueue(-1)
         self.open_dict = defaultdict(list)
+
+        # List containing visited nodes to prevent cycling between visited nodes
         self.closed_list = []
         self.closed_dict = {}
 
-        # assuming the boundary is of a square or rectangle
-        self.data = data
+        # Forbidden vertices list to prevent using such vertices
         self.forbidden_vertices = {}
 
-        self.obstacle_array = obstacles_array
-
+        # Row and column values are generated from provided x and y coordinates
         self.start_row, self.start_col = data.to_row_col_from_coord(start_xy[0], start_xy[1])
-        self.start: node = node.create(self.start_row, self.start_col, data)
-
         self.destination_row, self.destination_col = data.to_row_col_from_coord(destination_xy[0], destination_xy[1])
+
+        # Created the start node and destination node to use in the vertices generation
+        self.start: node = node.create(self.start_row, self.start_col, data)
         self.destination: node = node.create(self.destination_row, self.destination_col, data)
 
-        # self.row_col_possibilities = [(-1, 0), (1, 0), (0, 1), (0, -1), (-1, 1), (1, 1), (-1, -1), (1, -1)]
+        # To get all possible adjacent nodes from a node - list of possible row and column translation
         self.row_col_possibilities = [(1, -1), (1, 0), (1, 1), (0, -1), (0, 0), (0, 1), (-1, -1), (-1, 0), (-1, 1)]
 
     def run(self):
         # FIXME
         # insert forbidden/blocked vertices to the closed list
         # self.update_forbidden_nodes()
+        self.update_forbidden_vertices(self.data)
 
         # Create start vertex no parent and add to closed closed list
         if self.start is None:
@@ -57,7 +60,7 @@ class aStar:
             # remove the current vertex from the open list & dict
             current_vertex: vertex = pq_helper.pop_vertex(self.open_priority_queue, self.open_dict)
 
-            print(current_vertex)
+            # print(current_vertex)
 
             # FIXME - Should be good now??
             # add the current vertex to the closed list & dict
@@ -114,25 +117,20 @@ class aStar:
 
     # === Helper functions ===
 
-    def update_forbidden_nodes(self):
+    def update_forbidden_vertices(self, data: dt):
         for r in (0, self.data.rows - 1):
-            for c in range(0, self.data.cols):
-                # self.obstacle_array[self.data.to_index(r,c,self.cols)]
-                # self.update_closed_list(node(None, None, (r, c)))
-                self.forbidden_vertices[str(hash(node(None, None, (r, c))))] = (r, c)
+            for c in range(0, self.data.cols - 1):
+                node_a: node = node.create(r, c, data)
+                node_b: node = node.create(r, c + 1, data)
+                forbidden_vertex = vertex(node_a, node_b, None, None, None, None)
+                self.forbidden_vertices[str(hash(forbidden_vertex))] = ((r, c), (r, c + 1))
 
         for c in (0, self.data.cols - 1):
-            for r in range(0, self.data.rows):
-                # self.obstacle_array[self.data.to_index(r,c,self.cols)]
-                # self.update_closed_list(node(None, None, (r, c)))
-                self.forbidden_vertices[str(hash(node(None, None, (r, c))))] = (r, c)
-
-        blocked_grids_r_c = [self.data.to_row_col_from_index(i, self.data.cols) for i in range(len(self.obstacle_array))
-                             if
-                             self.obstacle_array[i] == 0]
-        for r_c in blocked_grids_r_c:
-            # self.update_closed_list(node(None, None, r_c))
-            self.forbidden_vertices[str(hash(node(None, None, r_c)))] = r_c
+            for r in range(0, self.data.rows - 1):
+                node_a: node = node.create(r, c, data)
+                node_b: node = node.create(r + 1, c, data)
+                forbidden_vertex = vertex(node_a, node_b, None, None, None, None)
+                self.forbidden_vertices[str(hash(forbidden_vertex))] = ((r, c), (r + 1, c))
 
     def update_closed_list(self, current_vertex):
         current_vertex_key = str(hash(current_vertex))
@@ -140,10 +138,6 @@ class aStar:
             return
         self.closed_dict[current_vertex_key] = current_vertex
         self.closed_list.append(current_vertex)
-
-    # def get_adjacent_node(self, current_node: node, possible_node):
-    #     return node(current_node, self.destination,
-    #                 (current_node.position[0] + possible_node[0], current_node.position[1] + possible_node[1]))
 
 
 # TEST CODE

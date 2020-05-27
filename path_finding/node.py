@@ -19,13 +19,16 @@ class node:
         """Create a node or return None if the row and col provided are invalid"""
         if not (data.rows > row >= 0 and data.cols > col >= 0):
             return None
+
         return cls(row, col, data)
 
     def __eq__(self, other):
         if self is None and other is None:
             raise Exception("Possible? ")
+
         elif self is None and other.node_a is not None:
             return False
+
         elif self is not None and other is None:
             return False
 
@@ -34,16 +37,20 @@ class node:
     def __add__(self, other):
         if self is None and other is None:
             raise Exception("Possible? ")
+
         elif self is None and other is not None:
             return other.row, other.col
+
         elif self is not None and other is None:
             return self.row, self.col
+
         # print ((self.row, self.col) + (other.row, other.col))
         return (self.row, self.col) + (other.row, other.col)
 
     def __repr__(self) -> str:
         if self is None:
             return ""
+
         return f" row_col: {(self.row, self.col)}"
 
     # def __hash__(self):
