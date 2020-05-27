@@ -1,33 +1,28 @@
 import math
 from functools import total_ordering
+from data_processing.data import data as dt
 
 
 # @total_ordering
 class node:
 
-    def __init__(self, parent, destination, position) -> None:
-        self.parent = parent
-        self.destination = destination
-        self.position = position
+    def __init__(self, x: float, y: float, data: dt) -> None:
+        self.row, self.col = data.to_row_col_from_coord(x, y)
+        self.x, self.y = data.to_coordinate_from_row_col((self.row, self.col))
 
-        self.g = 0
-        self.h = 0
-        self.f = 0
+        print(self.row, self.col)
 
-        if self.parent is not None:
-            self.g = self.parent.g + 1
-
-            self.h = math.sqrt(
-                pow((self.destination.position[1] - self.position[1]), 2) + pow(
-                    (self.destination.position[0] - self.position[0]), 2))
-
-            self.f = self.g + self.h
+        self.is_blocked = data.obstacles_arr[data.to_index(self.row, self.col, data.cols)]
 
     def __eq__(self, other):
-        return self.position == other.position
+        # if other is not None:
+        return self.row == other.row and self.col == other.col
 
-    def __hash__(self):
-        return hash(self.position)
+    def __add__(self, other):
+        return (self.row, self.col) + (other.row, other.col)
 
     def __repr__(self) -> str:
-        return f"==> parent: {self.parent}, destination: {self.destination}, position: {self.position} <== \n"
+        return f"x_y: {(self.x, self.y)}, row_col: {(self.row, self.col)}"
+
+    # def __hash__(self):
+    #     return hash(self.position)
