@@ -94,10 +94,16 @@ class vertex:
         return (self.node_a == other.node_a) and (self.node_b == other.node_b)
 
     def __hash__(self):
+        if self.node_a is None:
+            return hash(self.node_b + self.node_a)
+
         return hash(self.node_a + self.node_b)
 
     def __repr__(self) -> str:
-        return f" nodeA: {self.node_a}, nodeB: {self.node_b}, f_g_h: {(self.f, self.g, self.h)}, parent: {self.parent}, destination: {self.destination}, vertex_pos: {self.vertex_pos} "
+        return f" node_a: {self.node_a}, node_b: {self.node_b}, f_g_h: {(self.f, self.g, self.h)}, parent: {(self.parent)}\n"
+
+    # def __repr__(self) -> str:
+    #     return f" node_a: {self.node_a}, node_b: {self.node_b}, f_g_h: {(self.f, self.g, self.h)}, parent: {self.parent}, destination: {self.destination}, vertex_pos: {self.vertex_pos} "
 
 
 # TEST CODE

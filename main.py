@@ -11,6 +11,7 @@ from decimal import Decimal
 import data_processing.data as dt
 import data_processing.visualize as visualize
 from path_finding.a_star_algo import aStar
+from path_finding.vertex import vertex
 
 # ====== user input variables ======
 # FIXME : user input
@@ -41,7 +42,7 @@ figures_dir_path = "figures\\"
 # ====== logic ======
 
 # Initialize all the data arrays to represent crime matrix
-data = dt.data(square_grid_length, square_grid_length_padding, threshold, start, destination, shapes_data_path)
+data = dt.data(square_grid_length, square_grid_length_padding, threshold, shapes_data_path)
 data.update_crime_rate_array()
 data.sort_crime_data_arr()
 data.calculate_statistics()
@@ -49,6 +50,9 @@ data.update_obstacles_arr()
 
 # FIXME
 # call astar
+
+start = (data.lower_x_bound + 1 * 0.002, data.lower_y_bound + 1 * 0.002)
+destination = (data.lower_x_bound + 11 * 0.002, data.lower_y_bound + 2 * 0.002)
 
 aStar = aStar(start, destination, data.obstacles_arr, data)
 path = aStar.run()
@@ -79,10 +83,12 @@ visualize.draw_all_blocked_grids(data, ax)
 #                           (data.min_x + 5 * data.square_grid_length, data.min_y + data.square_grid_length * 3),
 #                           "data", "data", arrowstyle="-|>", shrinkA=1, shrinkB=1,
 #                           dpi_cor=30, color="blue", linewidth="2"))
-for node in path:
+
+for v in path:
     ax.add_patch(
-        patch.ConnectionPatch(data.to_coordinate_from_row_col(node.parent.position),
-                              data.to_coordinate_from_row_col(node.position), "data", "data", arrowstyle="-|>",
+        patch.ConnectionPatch(data.to_coordinate_from_row_col((v.node_a.row, v.node_a.col)),
+                              data.to_coordinate_from_row_col((v.node_b.row, v.node_b.col)), "data", "data",
+                              arrowstyle="-|>",
                               shrinkA=1, shrinkB=1, dpi_cor=30, color="blue", linewidth="2"))
 
 visualize.save_figure(plt, "all_crime_data.png", figures_dir_path)

@@ -1,12 +1,13 @@
 import itertools
+from numpy import inf
+import queue as q
+from collections import defaultdict
 
 from path_finding.node import node
 from path_finding.vertex import vertex
 from path_finding.priority_queue_helper import pq_helper
 from data_processing.data import data as dt
 
-import queue as q
-from collections import defaultdict
 
 
 class aStar:
@@ -49,13 +50,19 @@ class aStar:
         # self.update_forbidden_nodes()
 
         # Create start vertex no parent and add to closed closed list
-        start_vertex = v(None, self.start, None, self.destination, None, None)
+        if self.start is None:
+            raise Exception("Error: Start vertex was not created")
+
+        start_vertex = vertex(None, self.start, None, self.destination, None, None)
+        # input("press to contiue")
         pq_helper.add_vertex(start_vertex, self.open_priority_queue, self.open_dict)
 
         while not self.open_priority_queue.empty():
             # get current vertex from the openList with lowest f
             # remove the current vertex from the open list & dict
-            current_vertex: v = pq_helper.pop_vertex(self.open_priority_queue, self.open_dict)
+            current_vertex: vertex = pq_helper.pop_vertex(self.open_priority_queue, self.open_dict)
+
+            print(current_vertex)
 
             # FIXME - Should be good now??
             # add the current vertex to the closed list & dict
@@ -72,7 +79,7 @@ class aStar:
 
             # nodes.clear()
             nodes = list(
-                map(lambda x: node.create(current_vertex.node_b.row + x[0], current_vertex.node_b.col + x[1], dt),
+                map(lambda x: node.create(current_vertex.node_b.row + x[0], current_vertex.node_b.col + x[1], self.data),
                     self.row_col_possibilities))
 
             # Test print all nodes
@@ -86,24 +93,24 @@ class aStar:
             for v in vertices:
                 # FIXME ____>
 
-                adjacent_node = self.get_adjacent_node(current_vertex, v)
-                adjacent_node_key = str(hash(adjacent_node))
+                # v = self.get_adjacent_node(current_vertex, v)
+                v_key = str(hash(v))
 
                 # FIXME: Check if the node is within range
                 # FIXME: Check if the node is blocked or not
-                if str(hash(adjacent_node)) in self.forbidden_vertices:
-                    continue
+                # if str(hash(v)) in self.forbidden_vertices:
+                #     continue
 
-                if adjacent_node_key in self.closed_dict:
+                if v_key in self.closed_dict:
                     continue
 
                 # Fixme : duplicate keys for the map
-                if adjacent_node_key in self.open_dict:
-                    for node_entry in self.open_dict[adjacent_node_key]:
-                        if adjacent_node.g > node_entry[2].g:
+                if v_key in self.open_dict:
+                    for node_entry in self.open_dict[v_key]:
+                        if v.g > node_entry[2].g:
                             continue
 
-                pq_helper.add_vertex(adjacent_node, self.open_priority_queue, self.open_dict)
+                pq_helper.add_vertex(v, self.open_priority_queue, self.open_dict)
                 # ----> Fixme
 
     # === Helper functions ===
@@ -128,12 +135,12 @@ class aStar:
             # self.update_closed_list(node(None, None, r_c))
             self.forbidden_vertices[str(hash(node(None, None, r_c)))] = r_c
 
-    def update_closed_list(self, current_node):
-        current_node_key = str(hash(current_node))
-        if current_node_key in self.closed_dict:
+    def update_closed_list(self, current_vertex):
+        current_vertex_key = str(hash(current_vertex))
+        if current_vertex_key in self.closed_dict:
             return
-        self.closed_dict[current_node_key] = current_node
-        self.closed_list.append(current_node)
+        self.closed_dict[current_vertex_key] = current_vertex
+        self.closed_list.append(current_vertex)
 
     # def get_adjacent_node(self, current_node: node, possible_node):
     #     return node(current_node, self.destination,
@@ -159,7 +166,7 @@ if __name__ == "__main__":
                                   0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0,
                                   0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1]
 
-    dt = dt(0.002, 0.0001, 50, None, None, "..\\data\\Shape\\crime_dt.shp")
+    dt = dt(0.002, 0.0001, 50, "..\\data\\Shape\\crime_dt.shp")
 
     dt.obstacles_arr = obstacles_array_50_percent
 
