@@ -9,7 +9,6 @@ from path_finding.priority_queue_helper import pq_helper
 from data_processing.data import data as dt
 
 
-
 class aStar:
 
     def __init__(self, start_xy: tuple, destination_xy: tuple, obstacles_array: [], data: dt) -> None:
@@ -39,7 +38,7 @@ class aStar:
         self.destination: node = node.create(self.destination_row, self.destination_col, data)
 
         # self.row_col_possibilities = [(-1, 0), (1, 0), (0, 1), (0, -1), (-1, 1), (1, 1), (-1, -1), (1, -1)]
-        self.row_col_possibilities = [(1, -1), (1, 0), (1, 1), (0, -1), (0, 1), (-1, -1), (-1, 0), (-1, 1)]
+        self.row_col_possibilities = [(1, -1), (1, 0), (1, 1), (0, -1), (0, 0), (0, 1), (-1, -1), (-1, 0), (-1, 1)]
 
     def run(self):
         # FIXME
@@ -75,7 +74,8 @@ class aStar:
 
             # nodes.clear()
             nodes = list(
-                map(lambda x: node.create(current_vertex.node_b.row + x[0], current_vertex.node_b.col + x[1], self.data),
+                map(lambda x: node.create(current_vertex.node_b.row + x[0], current_vertex.node_b.col + x[1],
+                                          self.data),
                     self.row_col_possibilities))
 
             # Test print all nodes
@@ -84,7 +84,8 @@ class aStar:
             # vertices.clear()
             index = itertools.count()
             vertices = list(
-                map(lambda n, i: vertex(current_vertex.node_b, n, current_vertex, self.destination, i, nodes), nodes, index))
+                map(lambda n, i: vertex(current_vertex.node_b, n, current_vertex, self.destination, i, nodes), nodes,
+                    index))
 
             for v in vertices:
                 # FIXME ____>
@@ -202,6 +203,7 @@ if __name__ == "__main__":
     # Generate possibles nodes
     # node_possibilities = [(-1, 0), (1, 0), (0, 1), (0, -1), (-1, 1), (1, 1), (-1, -1), (1, -1)]
     # node_possibilities = [(1, -1), (1, 0), (1, 1), (0, -1), (0, 0), (0, 1), (-1, -1), (-1, 0), (-1, 1)]
+
     row_col_possibilities = [(1, -1), (1, 0), (1, 1), (0, -1), (0, 1), (-1, -1), (-1, 0), (-1, 1)]
 
     current_node = v1.node_b

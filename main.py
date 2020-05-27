@@ -85,12 +85,13 @@ visualize.draw_all_blocked_grids(data, ax)
 #                           "data", "data", arrowstyle="-|>", shrinkA=1, shrinkB=1,
 #                           dpi_cor=30, color="blue", linewidth="2"))
 
+color = "limegreen"
 for v in path:
     ax.add_patch(
         patch.ConnectionPatch(data.to_coordinate_from_row_col((v.node_a.row, v.node_a.col)),
                               data.to_coordinate_from_row_col((v.node_b.row, v.node_b.col)), "data", "data",
-                              arrowstyle="-|>",
-                              shrinkA=1, shrinkB=1, dpi_cor=30, color="blue", linewidth="2"))
+                              arrowstyle="-",
+                              shrinkA=1, shrinkB=1, dpi_cor=10, color=color , linewidth="8"))
 
 visualize.save_figure(plt, "all_crime_data.png", figures_dir_path)
 visualize.plot_show(plt, threshold)

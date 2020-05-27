@@ -37,18 +37,22 @@ class vertex:
                 self.calculate_g_straight(3, 6)
 
             elif self.vertex_pos == 4:
+                # itself
+                self.g = 0
+
+            elif self.vertex_pos == 5:
                 # right
                 self.calculate_g_straight(4, 7)
 
-            elif self.vertex_pos == 5:
+            elif self.vertex_pos == 6:
                 # diagonal bottom left
                 self.calculate_g_diagonal(6)
 
-            elif self.vertex_pos == 6:
+            elif self.vertex_pos == 7:
                 # down
                 self.calculate_g_straight(6, 7)
 
-            elif self.vertex_pos == 7:
+            elif self.vertex_pos == 8:
                 # diagonal bottom right
                 self.calculate_g_diagonal(7)
 
