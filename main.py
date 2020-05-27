@@ -65,13 +65,14 @@ import matplotlib.patches as patch
 data.print()
 
 # Visualize
-fig1 = plt.figure(1)
+fig1 = plt.figure(figsize=(15,15))
 ax = fig1.add_subplot(1, 1, 1)
 
 visualize = visualize.visualize()
 # visualize.plot_crime_coordinates(plt, data)
-visualize.draw_initial_patch(plt, ax, data, grid_buffer)
-visualize.draw_grids(plt, data)
+# visualize.draw_initial_patch(plt, ax, data, grid_buffer)
+visualize.draw_initial_grids(data, ax)
+visualize.draw_grid_lines(plt, data)
 visualize.draw_all_blocked_grids(data, ax)
 
 # FIXME
