@@ -126,10 +126,10 @@ class data:
         for i in range(0, self.obstacles_arr.__len__()):
             if self.obstacles_arr[i] >= self.threshold_val:
                 # Blocked
-                self.obstacles_arr[i] = 0
+                self.obstacles_arr[i] = 1
             else:
                 # Open
-                self.obstacles_arr[i] = 1
+                self.obstacles_arr[i] = 0
 
     # Visualize updated matrix of crime rates
     def crime_rate_matrix_grid_matched(self):
@@ -144,7 +144,7 @@ class data:
         return self.obstacles_arr.reshape(self.rows, self.cols)
 
     # This functions helps to get the crime rate array index using row, col convention
-    def to_index(self, row, col, cols):
+    def to_index(self, row: int, col:int, cols):
         return (row * cols) + col
 
     # This functions helps to get the row, col from a given index of the crime rate matrix array
@@ -168,7 +168,7 @@ class data:
         y_normalized = y + self.y_offset
         grid_col = x_normalized // self.square_grid_length
         grid_row = y_normalized // self.square_grid_length
-        return grid_row, grid_col
+        return int(grid_row), int(grid_col)
 
     def to_coordinate_from_row_col(self, row_col: tuple):
         row_coord = (self.lower_x_bound + row_col[1] * self.square_grid_length)

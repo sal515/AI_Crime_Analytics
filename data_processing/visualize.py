@@ -22,8 +22,8 @@ class visualize:
         for index in range(0, data.obstacles_arr.__len__()):
             self.draw_a_blocked_grid(data.obstacles_arr[index], index, data, ax, color)
 
-    def draw_a_blocked_grid(self, isOpen, index, data: dp.data, ax, color="yellow"):
-        if isOpen:
+    def draw_a_blocked_grid(self, isBlocked, index, data: dp.data, ax, color="yellow"):
+        if not isBlocked:
             return
 
         row_col = data.to_row_col_from_index(index, data.cols)
