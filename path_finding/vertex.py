@@ -5,8 +5,7 @@ import math
 
 class vertex:
 
-    def __init__(self, node_a: node, node_b: node, parent, destination: node, vertex_pos: int,
-                 possible_nodes: [node]) -> None:
+    def __init__(self, node_a: node, node_b: node, parent, destination: node, vertex_pos: int, possible_nodes: [node]) -> None:
         self.parent = parent
         self.destination: node = destination
 

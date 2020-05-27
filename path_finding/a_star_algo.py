@@ -3,17 +3,20 @@ import itertools
 from path_finding.node import node
 from path_finding.vertex import vertex
 from path_finding.priority_queue_helper import pq_helper
+from data_processing.data import data as dt
+
 import queue as q
 from collections import defaultdict
 
 
 class aStar:
 
-    def __init__(self, start, destination, obstacles_array, data) -> None:
+    def __init__(self, start_xy: tuple, destination_xy: tuple, obstacles_array: [], data: dt) -> None:
         # eg.
         # start -> node(None,None,  (0,0))
         # destination -> node(None, None, (9,3))
 
+        # TODO: CHECK if needed
         self.path = []
 
         self.open_priority_queue = q.PriorityQueue(-1)
@@ -28,44 +31,67 @@ class aStar:
         # self.rows = data.rows
         # self.cols = data.cols
         # self.forbidden_nodes = (self.rows * 2 + self.cols * 2) - 4
-        self.forbidden_nodes_dict = {}
+        self.forbidden_vertices = {}
 
         self.obstacle_array = obstacles_array
-        self.start: node = node(parent=None, destination=destination, position=start)
-        self.destination: node = node(parent=None, destination=destination, position=destination)
 
-        self.node_possibilities = [(-1, 0), (1, 0), (0, 1), (0, -1), (-1, 1), (1, 1), (-1, -1), (1, -1)]
+        self.start_row, self.start_col = data.to_row_col_from_coord(start_xy[0], start_xy[1])
+        self.start: node = node.create(self.start_row, self.start_col, data)
+
+        self.destination_row, self.destination_col = data.to_row_col_from_coord(destination_xy[0], destination_xy[1])
+        self.destination: node = node.create(self.destination_row, self.destination_col, data)
+
+        self.row_col_possibilities = [(-1, 0), (1, 0), (0, 1), (0, -1), (-1, 1), (1, 1), (-1, -1), (1, -1)]
 
     def run(self):
-        # insert blocked/corner nodes to the closed list
-        self.update_forbidden_nodes()
+        # insert forbidden/blocked vertices to the closed list
+        # FIXME
+        # self.update_forbidden_nodes()
 
-        pq_helper.add_node(self.start, self.open_priority_queue, self.open_dict)
+        # Create start vertex no parent and add to closed closed list
+        start_vertex = v(None, self.start, None, self.destination, None, None)
+        pq_helper.add_vertex(start_vertex, self.open_priority_queue, self.open_dict)
 
         while not self.open_priority_queue.empty():
-            # get current node from openList with lowest f
-            # remove the current node from the open list & dict
-            current_node: node = pq_helper.pop_node(self.open_priority_queue, self.open_dict)
+            # get current vertex from the openList with lowest f
+            # remove the current vertex from the open list & dict
+            current_vertex: v = pq_helper.pop_vertex(self.open_priority_queue, self.open_dict)
 
-            # FIXME
-            # add the current node to the closed list & dict
-            self.update_closed_list(current_node)
+            # FIXME - Should be good now??
+            # add the current vertex to the closed list & dict
+            self.update_closed_list(current_vertex)
 
-            if current_node == self.destination:
-                backtrace_node = current_node
-                while not backtrace_node == self.start:
-                    self.path.append(backtrace_node)
-                    backtrace_node = backtrace_node.parent
+            if current_vertex.node_b == self.destination:
+                # FIXME
+                backtrace_vertex = current_vertex
+                while not backtrace_vertex.node_b == self.start:
+                    self.path.append(backtrace_vertex)
+                    backtrace_vertex = backtrace_vertex.parent
                 # return shortest path
                 return self.path[::-1]
 
-            for possible_node in self.node_possibilities:
-                adjacent_node = self.get_adjacent_node(current_node, possible_node)
+            # nodes.clear()
+            nodes = list(
+                map(lambda x: node.create(current_vertex.node_b.row + x[0], current_vertex.node_b.col + x[1], dt),
+                    self.row_col_possibilities))
+
+            # Test print all nodes
+            # [print(i) for i in zip(enumerate(nodes)) if i is not None]
+
+            # vertices.clear()
+            index = itertools.count()
+            vertices = list(
+                map(lambda n, i: vertex(current_vertex.node_b, n, current_vertex, self.destination, i, nodes), nodes, index))
+
+            for v in vertices:
+                # FIXME ____>
+
+                adjacent_node = self.get_adjacent_node(current_vertex, v)
                 adjacent_node_key = str(hash(adjacent_node))
 
                 # FIXME: Check if the node is within range
                 # FIXME: Check if the node is blocked or not
-                if str(hash(adjacent_node)) in self.forbidden_nodes_dict:
+                if str(hash(adjacent_node)) in self.forbidden_vertices:
                     continue
 
                 if adjacent_node_key in self.closed_dict:
@@ -77,7 +103,8 @@ class aStar:
                         if adjacent_node.g > node_entry[2].g:
                             continue
 
-                pq_helper.add_node(adjacent_node, self.open_priority_queue, self.open_dict)
+                pq_helper.add_vertex(adjacent_node, self.open_priority_queue, self.open_dict)
+                # ----> Fixme
 
     # === Helper functions ===
 
@@ -86,20 +113,20 @@ class aStar:
             for c in range(0, self.data.cols):
                 # self.obstacle_array[self.data.to_index(r,c,self.cols)]
                 # self.update_closed_list(node(None, None, (r, c)))
-                self.forbidden_nodes_dict[str(hash(node(None, None, (r, c))))] = (r, c)
+                self.forbidden_vertices[str(hash(node(None, None, (r, c))))] = (r, c)
 
         for c in (0, self.data.cols - 1):
             for r in range(0, self.data.rows):
                 # self.obstacle_array[self.data.to_index(r,c,self.cols)]
                 # self.update_closed_list(node(None, None, (r, c)))
-                self.forbidden_nodes_dict[str(hash(node(None, None, (r, c))))] = (r, c)
+                self.forbidden_vertices[str(hash(node(None, None, (r, c))))] = (r, c)
 
         blocked_grids_r_c = [self.data.to_row_col_from_index(i, self.data.cols) for i in range(len(self.obstacle_array))
                              if
                              self.obstacle_array[i] == 0]
         for r_c in blocked_grids_r_c:
             # self.update_closed_list(node(None, None, r_c))
-            self.forbidden_nodes_dict[str(hash(node(None, None, r_c)))] = r_c
+            self.forbidden_vertices[str(hash(node(None, None, r_c)))] = r_c
 
     def update_closed_list(self, current_node):
         current_node_key = str(hash(current_node))
@@ -185,55 +212,6 @@ if __name__ == "__main__":
 
     [print(i) for i in zip(enumerate(vertices_possible))]
 
-    # p_origin = point(dt.start, dt)
-    # p_destination = point(dt.destination, dt)
-    #
-    # p1 = point((dt.lower_x_bound + 1 * 0.00200001, dt.lower_y_bound + 1 * 0.00200001), dt)
-    # p2 = point((dt.lower_x_bound + 2 * 0.00200001, dt.lower_y_bound + 2 * 0.00200001), dt)
-    # p3 = point((dt.lower_x_bound + 5 * 0.00200001, dt.lower_y_bound + 9 * 0.00200001), dt)
-    #
-    # print(p_origin)
-    # print(p_destination)
-    #
-    # print((p_origin + p_destination))
-    # print(hash(p_origin + p_destination))
-    # print((p_destination + p_origin))
-    # print(hash(p_destination + p_origin))
-    #
-    # print((p_origin == p_destination))
-    # print((p_origin == p_origin))
-    #
-    # # Vertex Test
-    # v1 = vertex(None, p_destination, p_origin, p1)
-    # v2 = vertex(v1, p_destination, p1, p2)
-    # v3 = vertex(v2, p_destination, p2, p3)
-    #
-    # print("v1: ", v1)
-    # print("v2: ", v2)
-    # print("v3: ", v3)
-    #
-    # print("v1: ", hash(v1))
-    # print("v1: ", hash(v1))
-    # print("v2: ", hash(v2))
-    # print("v3: ", hash(v3))
-    #
-    # # vertex generation from a point
-    # print("p origin: ", p_origin)
-    #
-    # # sgl = dt.square_grid_length+dt.square_grid_length_padding
-    # sgl = dt.square_grid_length
-    #
-    # print("origin:", (dt.start[0], dt.start[1]))
-    # print("origin:", (dt.min_x, dt.min_y))
-    #
-    # possibilities = [(-sgl, 0), (sgl, 0), (0, sgl), (0, -sgl), (-sgl, sgl), (sgl, sgl), (-sgl, -sgl), (sgl, -sgl)]
-    #
-    # possibilities_calc = list(map(lambda i: (dt.start[0] + i[0], dt.start[1] + i[1]), possibilities))
-    #
-    # point_possibilities = list(map(lambda i: point((dt.start[0] + i[0], dt.start[1] + i[1]), dt), possibilities))
-    #
-    # # [print(i, (dt.start)) for i in zip(enumerate(point_possibilities),(possibilities))]
-    #
-    # [print(i, (dt.start)) for i in zip(enumerate(point_possibilities), possibilities, possibilities_calc)]
+    [print(hash(i)) for i in zip(enumerate(vertices_possible)) if i is not None]
 
     pass
