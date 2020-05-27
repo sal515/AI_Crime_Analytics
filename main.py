@@ -5,28 +5,35 @@
 # For COMP 472 Section - ABIX – Summer 2020
 # --------------------------------------------------------
 
-# TODO: Move functions to separate package
-# ====== functions ======
-import math
-
-
-def save_figure(plt, figureName):
-    plt.savefig("".join([figures_dir_path, figureName]))
-
-
-# ====== imports ======
-import geopandas
-import matplotlib.axes as axes
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from shapely.geometry import Polygon as polygon
-from shapely.geometry import MultiPoint
-from shapely.geometry import Point
-import numpy as np
+from decimal import Decimal
+
+import data_processing.data as dt
+import data_processing.visualize as visualize
+from path_finding.a_star_algo import aStar
+from path_finding.vertex import vertex
 
 # ====== user input variables ======
-square_grid_length = 0.002
+# FIXME : user input
+# TODO: grid length should be a string
+square_grid_length_input = "0.002"
+square_grid_length_input = square_grid_length_input.replace(",", "")
+if not square_grid_length_input.replace(".", "").isdigit():
+    # wrong input from the user for the grid size
+    print("wrong input")
+    quit(-1)
+square_grid_length_exponent = Decimal(square_grid_length_input).as_tuple().exponent
+square_grid_length_padding = 1 / pow(10, abs(square_grid_length_exponent) + 1)
+square_grid_length = float(square_grid_length_input)
+
 grid_buffer = square_grid_length * 2
+threshold = 90
+
+start = (8, 2)
+destination = (6, 8)
+
+# Fixme: Why is everythong blocked for threshold < 50 for 0.001 grids
+
 
 # ====== constant path variables ======
 shapes_data_path = "data\\Shape\\crime_dt.shp"
@@ -34,90 +41,60 @@ figures_dir_path = "figures\\"
 
 # ====== logic ======
 
-# Read shape file using geopanda as a dataframe
-crime_data = geopandas.read_file(shapes_data_path)
+# Initialize all the data arrays to represent crime matrix
+data = dt.data(square_grid_length, square_grid_length_padding, threshold, shapes_data_path)
+data.update_crime_rate_array()
+data.sort_crime_data_arr()
+data.calculate_statistics()
+data.update_obstacles_arr()
 
-# Extract all the points from the data frame as a list of points
-x_y_pair = list(map(lambda point: list(point.coords)[0], crime_data.geometry))
-x = list(map(lambda point: point[0], x_y_pair))
-y = list(map(lambda point: point[1], x_y_pair))
+# FIXME
+# call astar
 
-# To draw the grids: identifying the bounds of the given data
-# By creating a polygon using all the crime data points
-min_x = min(x)
-min_y = min(y)
-max_x = max(x)
-max_y = max(y)
-print(f"bounds: (minx:{min_x}, miny:{min_y}, maxx:{max_x}, maxy:{max_y}) ")
+start = (data.lower_x_bound + 1 * 0.002, data.lower_y_bound + 1 * 0.002)
+destination = (data.lower_x_bound + 11 * 0.002, data.lower_y_bound + 2 * 0.002)
 
-# poly = polygon(x_y_pair)
-# bounds = poly.bounds
-# print("bounds: (minx-0, miny-1, maxx-2, maxy-3) ", bounds)
+aStar = aStar(start, destination, data.obstacles_arr, data)
+path = aStar.run()
 
-# To draw the grids: calculating required rows and cols
-cols = int(math.ceil(abs(abs(max_x) - abs(min_x)) / square_grid_length))
-rows = int(math.ceil(abs(abs(max_y) - abs(min_y)) / square_grid_length))
+# call path_to_coordinate_func
+import matplotlib.patches as patch
 
-# To get perfect square grids: calculating the bounds
-lower_x_bound = min_x
-upper_x_bound = min_x + (cols * square_grid_length)
-lower_y_bound = min_y
-upper_y_bound = min_y + (rows * square_grid_length)
+# Print data
+# FIXME: The outputs needs to be cleaned up and easy to read
+data.print()
 
-# To draw the grids:, generating the x and y points of the grids
-col_points = list(
-    np.arange(min_x, (upper_x_bound + (square_grid_length / 3)), square_grid_length))
-
-row_points = list(
-    np.arange(min_y, (upper_y_bound + (square_grid_length / 3)), square_grid_length))
-
-print("column points: ", col_points)
-print("row points: ", row_points)
-
-# To draw initial purple patch: calculate the rectangular grid length & width
-max_y_length = abs(abs(upper_y_bound) - abs(min_y))
-max_x_length = abs(abs(upper_x_bound) - abs(min_x))
-
-# For visualization: Generate a figure with all the data shown
-# crime_data.geometry.plot(ax=ax)
-fig1 = plt.figure(1)
+# Visualize
+fig1 = plt.figure(figsize=(15,15))
 ax = fig1.add_subplot(1, 1, 1)
 
-# To view the plot easily: Set axis bounds with buffer around edges
-plt.axis([(min(x) - grid_buffer), (max(x) + grid_buffer), (min(y) - grid_buffer), (max(y) + grid_buffer)])
+visualize = visualize.visualize()
+# visualize.plot_crime_coordinates(plt, data)
+# visualize.draw_initial_patch(plt, ax, data, grid_buffer)
+visualize.draw_initial_grids(data, ax)
+visualize.draw_grid_lines(plt, data)
+visualize.draw_all_blocked_grids(data, ax)
 
-rect_initial = patches.Rectangle((min(x), min(y)), max_x_length, max_y_length, color="purple")
-ax.add_patch(rect_initial)
+# FIXME
+# visualize.draw_counts_on_plot(ax, data)
+# visualize astar path (ax, data, path)
 
-# To view the data: Plot points
-plt.plot(x, y, "o")
+# ax.add_patch(
+#     patch.ConnectionPatch((data.min_x + 0 * data.square_grid_length, data.min_y + data.square_grid_length * 0),
+#                           (data.min_x + 5 * data.square_grid_length, data.min_y + data.square_grid_length * 3),
+#                           "data", "data", arrowstyle="-|>", shrinkA=1, shrinkB=1,
+#                           dpi_cor=30, color="blue", linewidth="2"))
 
-# To view the grids: Drawing lines vertical and horizontal
-for i in col_points:
-    plt.axvline(x=i)
-for i in row_points:
-    plt.axhline(y=i)
+color = "limegreen"
+for v in path:
+    ax.add_patch(
+        patch.ConnectionPatch(data.to_coordinate_from_row_col((v.node_a.row, v.node_a.col)),
+                              data.to_coordinate_from_row_col((v.node_b.row, v.node_b.col)), "data", "data",
+                              arrowstyle="-",
+                              shrinkA=1, shrinkB=1, dpi_cor=10, color=color , linewidth="8"))
 
-# TODO: figure out why lambda doesn't work
-# map(lambda col: plt.axvline(x=col), col_points)
-# FIXME: Fix the grid lines to span only on the data points area
-# start_point = [col_points[3], row_points[0]]
-# end_point = [col_points[3], row_points[(row_points.__len__() - 1)]]
-# plt.plot(start_point, end_point)
-
-
-# To visualize high risk grids: Add yellow rectangles
-rect_high_risk = patches.Rectangle((min(x), min(y)), square_grid_length, square_grid_length, color="red")
-ax.add_patch(rect_high_risk)
-
-risky_grid = (min(x), min(y))
-
-rect_high_risk = patches.Rectangle(risky_grid, square_grid_length, square_grid_length, color="yellow")
-ax.add_patch(rect_high_risk)
-
-# Display plot
-save_figure(plt, "all_crime_data.png")
-plt.show()
+visualize.save_figure(plt, "all_crime_data.png", figures_dir_path)
+visualize.plot_show(plt, threshold)
 
 # ===== end of program =====
 print("=== program terminated ===")
