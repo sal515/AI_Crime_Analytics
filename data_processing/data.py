@@ -2,12 +2,17 @@ import geopandas
 import numpy as np
 import math
 from functools import reduce
+from collections.abc import Iterable
 
 
 class data:
-    def __init__(self, square_grid_length, threshold, data_file_path) -> None:
+    def __init__(self, square_grid_length, square_grid_length_padding, threshold, data_file_path) -> None:
+
         self.threshold = threshold
         self.square_grid_length = square_grid_length
+        self.square_grid_length_padding = square_grid_length_padding
+        # self.start = start
+        # self.destination = destination
 
         # Read shape file using geopanda as a dataframe
         self.crime_data = geopandas.read_file(data_file_path)
@@ -55,19 +60,12 @@ class data:
         self.x_offset = 0 - self.min_x
         self.y_offset = 0 - self.min_y
 
-        # To create crime rate matrix: Calculate offset values of x and y
-        self.x_normalized = np.array(self.x) + self.x_offset
-        self.y_normalized = np.array(self.y) + self.y_offset
-        # Or using numpy to get the same effect
-        # x_offset = list(map(lambda x_val: x_val + x_axis_offset, x))
-        # y_offset = list(map(lambda y_val: y_val + y_axis_offset, y))
-
-        # To create crime rate matrix: Identify the crime coord. to corresponding grids
-        self.grid_col = np.array(self.x_normalized // self.square_grid_length, dtype=int)
-        self.grid_row = np.array(self.y_normalized // self.square_grid_length, dtype=int)
+        # To create crime rate matrix: Calculate offset values of x and y and identify the crime coord. to corresponding grids
+        self.grid_row, self.grid_col = self.to_row_col_from_coord(self.x, self.y)
 
         # To create crime rate matrix: Calculate matrix size and generate empty matrix
-        self.crime_rate_arr = np.zeros(self.rows * self.cols, dtype=int)
+        self.number_of_grids = self.rows * self.cols
+        self.crime_rate_arr = np.zeros(self.number_of_grids, dtype=int)
 
         # Sorted crime rate array to determine threshold
         self.crime_rate_arr_sorted = None
@@ -78,6 +76,7 @@ class data:
         self.std_dev = None
 
         # Obstacles array identifies the blocked and non-blocked grids
+        self.threshold_val = None
         self.obstacles_arr = None
 
         # FIXME: Fix the data storing as file functions
@@ -110,24 +109,27 @@ class data:
 
     # Updating blocked and non-blocked areas on matrix
     def update_obstacles_arr(self):
+        self.sort_crime_data_arr()
+        self.median = np.median(self.crime_rate_arr_sorted)
         self.obstacles_arr = self.crime_rate_arr.copy()
 
         if self.threshold == 50:
-            threshold_val = self.median
+            self.threshold_val = self.median
         else:
-            max_blocked_index = math.floor((self.rows * self.cols) * (1 - (self.threshold / 100)))
+            max_blocked_index = math.floor(self.number_of_grids * (1 - (self.threshold / 100)))
             max_blocked_index = 1 if (max_blocked_index <= 0) else max_blocked_index
 
-            threshold_val = self.crime_rate_arr_sorted[max_blocked_index - 1]
+            self.threshold_val = self.crime_rate_arr_sorted[max_blocked_index - 1]
 
-            threshold_val = max(self.crime_rate_arr_sorted) + 1 if (self.threshold == 100) else threshold_val
+            self.threshold_val = max(self.crime_rate_arr_sorted) + 1 if (self.threshold == 100) else self.threshold_val
+
         for i in range(0, self.obstacles_arr.__len__()):
-            if self.obstacles_arr[i] >= threshold_val:
+            if self.obstacles_arr[i] >= self.threshold_val:
                 # Blocked
-                self.obstacles_arr[i] = 0
+                self.obstacles_arr[i] = 1
             else:
                 # Open
-                self.obstacles_arr[i] = 1
+                self.obstacles_arr[i] = 0
 
     # Visualize updated matrix of crime rates
     def crime_rate_matrix_grid_matched(self):
@@ -137,13 +139,41 @@ class data:
     def crime_rate_matrix(self):
         return self.crime_rate_arr.reshape(self.rows, self.cols)
 
+    # Visualize Obstacles Matrix
+    def obstacle_matrix(self):
+        return self.obstacles_arr.reshape(self.rows, self.cols)
+
     # This functions helps to get the crime rate array index using row, col convention
-    def to_index(self, row, col, cols):
+    def to_index(self, row: int, col:int, cols):
         return (row * cols) + col
 
     # This functions helps to get the row, col from a given index of the crime rate matrix array
-    def to_row_col(self, index, cols):
+    def to_row_col_from_index(self, index, cols):
         return divmod(index, cols)
+
+    # To create crime rate matrix: Calculate offset values of x and y and identify the crime coord. to corresponding grids
+    def to_row_col_from_coord(self, x, y):
+        if isinstance(x, Iterable) and isinstance(y, Iterable):
+            x_normalized = np.array(x) + self.x_offset
+            y_normalized = np.array(y) + self.y_offset
+            # Or using numpy to get the same effect
+            # x_offset = list(map(lambda x_val: x_val + x_axis_offset, x))
+            # y_offset = list(map(lambda y_val: y_val + y_axis_offset, y))
+            grid_col = np.array(x_normalized // self.square_grid_length, dtype=int)
+            grid_row = np.array(y_normalized // self.square_grid_length, dtype=int)
+
+            return grid_row, grid_col
+
+        x_normalized = x + self.x_offset
+        y_normalized = y + self.y_offset
+        grid_col = x_normalized // self.square_grid_length
+        grid_row = y_normalized // self.square_grid_length
+        return int(grid_row), int(grid_col)
+
+    def to_coordinate_from_row_col(self, row_col: tuple):
+        row_coord = (self.lower_x_bound + row_col[1] * self.square_grid_length)
+        col_coord = (self.lower_y_bound + row_col[0] * self.square_grid_length)
+        return row_coord, col_coord
 
     # view the crime rate array as a matrix
     def iterate_crime_rate_matrix(self, cr_matrix, rows, cols):
@@ -166,3 +196,16 @@ class data:
         print("Average ", self.average)
         print("Standard Deviation ", self.std_dev)
         print("Obstacles array ", self.obstacles_arr)
+        print("Obstacles Matrix ", self.obstacle_matrix())
+
+    # def test_obstacles_arr(self, test_np_list: np.ndarray, threshold):
+    #     self.crime_rate_arr = test_np_list
+    #     self.threshold = threshold
+    #     self.number_of_grids = test_np_list.__len__()
+    #     self.update_obstacles_arr()
+    #     print(list(self.crime_rate_arr))
+    #     print(list(self.obstacles_arr))
+    #
+    #     # run
+    #     # import numpy as np
+    #     # data.test_obstacles_arr(np.array([10, 9, 9, 9, 9, 4, 4, 4, 2, 2, 1]), 80)
