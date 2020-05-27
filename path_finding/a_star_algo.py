@@ -22,12 +22,11 @@ class aStar:
         self.closed_list = []
         self.closed_dict = {}
 
-        self.data = data
-        self.rows = data.rows
-        self.cols = data.cols
-
         # assuming the boundary is of a square or rectangle
-        self.forbidden_nodes = (self.rows * 2 + self.cols * 2) - 4
+        self.data = data
+        # self.rows = data.rows
+        # self.cols = data.cols
+        # self.forbidden_nodes = (self.rows * 2 + self.cols * 2) - 4
         self.forbidden_nodes_dict = {}
 
         self.obstacle_array = obstacles_array
@@ -82,19 +81,21 @@ class aStar:
     # === Helper functions ===
 
     def update_forbidden_nodes(self):
-        for r in (0, self.rows-1):
-            for c in range(0, self.cols):
+        for r in (0, self.data.rows - 1):
+            for c in range(0, self.data.cols):
                 # self.obstacle_array[self.data.to_index(r,c,self.cols)]
                 # self.update_closed_list(node(None, None, (r, c)))
-                self.forbidden_nodes_dict[str(hash(node(None, None, (r, c))))] = (r,c)
+                self.forbidden_nodes_dict[str(hash(node(None, None, (r, c))))] = (r, c)
 
-        for c in (0, self.cols-1):
-            for r in range(0, self.rows):
+        for c in (0, self.data.cols - 1):
+            for r in range(0, self.data.rows):
                 # self.obstacle_array[self.data.to_index(r,c,self.cols)]
                 # self.update_closed_list(node(None, None, (r, c)))
-                self.forbidden_nodes_dict[str(hash(node(None, None, (r, c))))] = (r,c)
+                self.forbidden_nodes_dict[str(hash(node(None, None, (r, c))))] = (r, c)
 
-        blocked_grids_r_c = [self.data.to_row_col(i, self.data.cols) for i in range(len(self.obstacle_array)) if self.obstacle_array[i] == 0]
+        blocked_grids_r_c = [self.data.to_row_col_from_index(i, self.data.cols) for i in range(len(self.obstacle_array))
+                             if
+                             self.obstacle_array[i] == 0]
         for r_c in blocked_grids_r_c:
             # self.update_closed_list(node(None, None, r_c))
             self.forbidden_nodes_dict[str(hash(node(None, None, r_c)))] = r_c
@@ -109,3 +110,7 @@ class aStar:
     def get_adjacent_node(self, current_node: node, possible_node):
         return node(current_node, self.destination,
                     (current_node.position[0] + possible_node[0], current_node.position[1] + possible_node[1]))
+
+# TEST CODE
+if __name__ == "__main__":
+    pass

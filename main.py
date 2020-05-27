@@ -6,15 +6,32 @@
 # --------------------------------------------------------
 
 import matplotlib.pyplot as plt
+from decimal import Decimal
 
 import data_processing.data as dt
 import data_processing.visualize as visualize
 from path_finding.a_star_algo import aStar
 
 # ====== user input variables ======
-square_grid_length = 0.002
+# FIXME : user input
+# TODO: grid length should be a string
+square_grid_length_input = "0.002"
+square_grid_length_input = square_grid_length_input.replace(",", "")
+if not square_grid_length_input.replace(".", "").isdigit():
+    # wrong input from the user for the grid size
+    print("wrong input")
+    quit(-1)
+square_grid_length_exponent = Decimal(square_grid_length_input).as_tuple().exponent
+square_grid_length_padding = 1 / pow(10, abs(square_grid_length_exponent) + 1)
+square_grid_length = float(square_grid_length_input)
+
 grid_buffer = square_grid_length * 2
 threshold = 90
+
+start = (8, 2)
+destination = (6, 8)
+
+# Fixme: Why is everythong blocked for threshold < 50 for 0.001 grids
 
 
 # ====== constant path variables ======
@@ -24,7 +41,7 @@ figures_dir_path = "figures\\"
 # ====== logic ======
 
 # Initialize all the data arrays to represent crime matrix
-data = dt.data(square_grid_length, threshold, shapes_data_path)
+data = dt.data(square_grid_length, square_grid_length_padding, threshold, start, destination, shapes_data_path)
 data.update_crime_rate_array()
 data.sort_crime_data_arr()
 data.calculate_statistics()
@@ -32,8 +49,7 @@ data.update_obstacles_arr()
 
 # FIXME
 # call astar
-start = (8, 2)
-destination = (6, 8)
+
 aStar = aStar(start, destination, data.obstacles_arr, data)
 path = aStar.run()
 
@@ -63,11 +79,11 @@ visualize.draw_all_blocked_grids(data, ax)
 #                           (data.min_x + 5 * data.square_grid_length, data.min_y + data.square_grid_length * 3),
 #                           "data", "data", arrowstyle="-|>", shrinkA=1, shrinkB=1,
 #                           dpi_cor=30, color="blue", linewidth="2"))
-
-
 for node in path:
     ax.add_patch(
-        patch.ConnectionPatch(data.to_coordinate(node.parent.position), data.to_coordinate(node.position), "data", "data", arrowstyle="-|>", shrinkA=1, shrinkB=1, dpi_cor=30, color="blue", linewidth="2"))
+        patch.ConnectionPatch(data.to_coordinate_from_row_col(node.parent.position),
+                              data.to_coordinate_from_row_col(node.position), "data", "data", arrowstyle="-|>",
+                              shrinkA=1, shrinkB=1, dpi_cor=30, color="blue", linewidth="2"))
 
 visualize.save_figure(plt, "all_crime_data.png", figures_dir_path)
 visualize.plot_show(plt, threshold)

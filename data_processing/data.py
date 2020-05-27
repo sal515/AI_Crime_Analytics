@@ -6,9 +6,13 @@ from collections.abc import Iterable
 
 
 class data:
-    def __init__(self, square_grid_length, threshold, data_file_path) -> None:
+    def __init__(self, square_grid_length, square_grid_length_padding, threshold, start, destination, data_file_path) -> None:
+
         self.threshold = threshold
         self.square_grid_length = square_grid_length
+        self.square_grid_length_padding = square_grid_length_padding
+        self.start = start
+        self.destination = destination
 
         # Read shape file using geopanda as a dataframe
         self.crime_data = geopandas.read_file(data_file_path)
@@ -166,7 +170,7 @@ class data:
         grid_row = y_normalized // self.square_grid_length
         return grid_row, grid_col
 
-    def to_coordinate(self, row_col: tuple):
+    def to_coordinate_from_row_col(self, row_col: tuple):
         row_coord = (self.lower_x_bound + row_col[1] * self.square_grid_length)
         col_coord = (self.lower_y_bound + row_col[0] * self.square_grid_length)
         return row_coord, col_coord
