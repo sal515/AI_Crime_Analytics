@@ -21,7 +21,6 @@ class aStar:
         self.path = []
 
         self.open_priority_queue = q.PriorityQueue(-1)
-        # self.open_dict = {}
         # FIXME: Check anything related to the open dict and duplicate keys
         self.open_dict = defaultdict(list)
         self.closed_list = []
@@ -29,9 +28,6 @@ class aStar:
 
         # assuming the boundary is of a square or rectangle
         self.data = data
-        # self.rows = data.rows
-        # self.cols = data.cols
-        # self.forbidden_nodes = (self.rows * 2 + self.cols * 2) - 4
         self.forbidden_vertices = {}
 
         self.obstacle_array = obstacles_array
@@ -42,11 +38,12 @@ class aStar:
         self.destination_row, self.destination_col = data.to_row_col_from_coord(destination_xy[0], destination_xy[1])
         self.destination: node = node.create(self.destination_row, self.destination_col, data)
 
-        self.row_col_possibilities = [(-1, 0), (1, 0), (0, 1), (0, -1), (-1, 1), (1, 1), (-1, -1), (1, -1)]
+        # self.row_col_possibilities = [(-1, 0), (1, 0), (0, 1), (0, -1), (-1, 1), (1, 1), (-1, -1), (1, -1)]
+        self.row_col_possibilities = [(1, -1), (1, 0), (1, 1), (0, -1), (0, 1), (-1, -1), (-1, 0), (-1, 1)]
 
     def run(self):
-        # insert forbidden/blocked vertices to the closed list
         # FIXME
+        # insert forbidden/blocked vertices to the closed list
         # self.update_forbidden_nodes()
 
         # Create start vertex no parent and add to closed closed list
@@ -54,7 +51,6 @@ class aStar:
             raise Exception("Error: Start vertex was not created")
 
         start_vertex = vertex(None, self.start, None, self.destination, None, None)
-        # input("press to contiue")
         pq_helper.add_vertex(start_vertex, self.open_priority_queue, self.open_dict)
 
         while not self.open_priority_queue.empty():
@@ -93,13 +89,15 @@ class aStar:
             for v in vertices:
                 # FIXME ____>
 
-                # v = self.get_adjacent_node(current_vertex, v)
                 v_key = str(hash(v))
 
                 # FIXME: Check if the node is within range
                 # FIXME: Check if the node is blocked or not
                 # if str(hash(v)) in self.forbidden_vertices:
                 #     continue
+
+                if v.f == inf:
+                    continue
 
                 if v_key in self.closed_dict:
                     continue
