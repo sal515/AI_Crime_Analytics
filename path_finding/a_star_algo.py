@@ -137,12 +137,19 @@ if __name__ == "__main__":
     dt.obstacles_arr = obstacles_array_50_percent
 
     # Test node
-    origin_node = node(dt.lower_x_bound + 1 * 0.002, dt.lower_y_bound + 1 * 0.002, dt)
-    destination_node = node(dt.lower_x_bound + 2 * 0.002, dt.lower_y_bound + 6 * 0.002, dt)
+    # origin_node = node(dt.lower_x_bound + 1 * 0.002, dt.lower_y_bound + 1 * 0.002, dt)
+    # destination_node = node(dt.lower_x_bound + 2 * 0.002, dt.lower_y_bound + 6 * 0.002, dt)
+    #
+    # node1 = node(dt.lower_x_bound + -1 * 0.002, dt.lower_y_bound + 6 * 0.002, dt)
+    # node2 = node(dt.lower_x_bound + 2 * 0.002, dt.lower_y_bound + 6 * 0.002, dt)
+    # node3 = node(dt.lower_x_bound + 2 * 0.002, dt.lower_y_bound + 6 * 0.002, dt)
 
-    node1 = node(dt.lower_x_bound + -1 * 0.002, dt.lower_y_bound + 6 * 0.002, dt)
-    node2 = node(dt.lower_x_bound + 2 * 0.002, dt.lower_y_bound + 6 * 0.002, dt)
-    node3 = node(dt.lower_x_bound + 2 * 0.002, dt.lower_y_bound + 6 * 0.002, dt)
+    origin_node = node.create(0, 0, dt)
+    destination_node = node.create(4, 2, dt)
+
+    node1 = node.create(1, 1, dt)
+    node2 = node.create(2, 1, dt)
+    node3 = node.create(2, 2, dt)
 
     print("start node: ", origin_node)
     print("destination node: ", destination_node)
@@ -150,10 +157,10 @@ if __name__ == "__main__":
     print(origin_node == origin_node)
 
     # Test vertex
-    v1 = vertex(None, origin_node, None, destination_node)
-    v2 = vertex(origin_node, node1, v1, destination_node)
-    v3 = vertex(node1, node2, v2, destination_node)
-    v4 = vertex(node2, node3, v3, destination_node)
+    v1 = vertex(None, origin_node, None, destination_node, None, None)
+    v2 = vertex(origin_node, node1, v1, destination_node, None, None)
+    v3 = vertex(node1, node2, v2, destination_node, None, None)
+    v4 = vertex(node2, node3, v3, destination_node, None, None)
 
     print("(v1 == v1)", (v1 == v1))
     print("(v1 == v2)", (v1 == v2))
@@ -162,19 +169,21 @@ if __name__ == "__main__":
 
     # Generate possibles nodes
     # node_possibilities = [(-1, 0), (1, 0), (0, 1), (0, -1), (-1, 1), (1, 1), (-1, -1), (1, -1)]
-    node_possibilities = [(1, -1), (1, 0), (1, 1), (0, -1), (0, 0), (0, 1), (-1, -1), (-1, 0), (-1, 1)]
+    # node_possibilities = [(1, -1), (1, 0), (1, 1), (0, -1), (0, 0), (0, 1), (-1, -1), (-1, 0), (-1, 1)]
+    row_col_possibilities = [(1, -1), (1, 0), (1, 1), (0, -1), (0, 1), (-1, -1), (-1, 0), (-1, 1)]
 
     current_node = v1.node_b
-    all_possible_nodes = []
+    node_possibilities = list(
+        map(lambda x: node.create(current_node.row + x[0], current_node.col + x[1], dt), row_col_possibilities))
 
-    for i in node_possibilities:
-        new_x_y = dt.to_coordinate_from_row_col((current_node.row + i[0], current_node.col + i[1]))
-        all_possible_nodes.append(node(new_x_y[0], new_x_y[1], dt))
+    [print(i) for i in zip(enumerate(node_possibilities)) if i is not None]
 
-    # all_possible_nodes = list(
-    #     map(lambda x:, node_possibilities))
+    index = itertools.count()
+    vertices_possible = list(
+        map(lambda x, i: vertex(current_node, x, v1, destination_node, i, node_possibilities), node_possibilities,
+            index))
 
-    [print(i) for i in zip(enumerate(all_possible_nodes))]
+    [print(i) for i in zip(enumerate(vertices_possible))]
 
     # p_origin = point(dt.start, dt)
     # p_destination = point(dt.destination, dt)
@@ -226,7 +235,5 @@ if __name__ == "__main__":
     # # [print(i, (dt.start)) for i in zip(enumerate(point_possibilities),(possibilities))]
     #
     # [print(i, (dt.start)) for i in zip(enumerate(point_possibilities), possibilities, possibilities_calc)]
-
-    pass
 
     pass
