@@ -54,15 +54,23 @@ if __name__ == "__main__":
     data.calculate_statistics()
     data.update_obstacles_arr()
 
-    # FIXME: The outputs needs to be cleaned up and easy to read
     """ Print all the generated data and matrices """
     data.print()
 
     """ Test coordinates for start and destination for debug """
-    test_start = (data.lower_x_bound + 1 * 0.002001, data.lower_y_bound + 1 * 0.002001)
+    gridlen = data.sqr_grid_length + data.sqr_grid_length_pad
+    test_start = (data.lower_x_bound + 0 * gridlen, data.lower_y_bound + 1 * gridlen)
     # test_destination = (data.lower_x_bound + 11 * 0.0020001, data.lower_y_bound + 2 * 0.002001)
     # test_destination = (data.lower_x_bound + 18 * 0.0020001, data.lower_y_bound + 6 * 0.002001)
-    test_destination = (data.lower_x_bound + 7 * 0.0020001, data.lower_y_bound + 11 * 0.002001)
+    test_destination = (data.lower_x_bound + 1 * gridlen, data.lower_y_bound + 3 * gridlen)
+
+    if not (data.min_x <= test_destination[0] <= data.max_x and data.min_y <= test_destination[1] <= data.max_y):
+        print("Destination is out of bounds")
+        quit(-1)
+
+    if not (data.min_x <= test_start[0] <= data.max_x and data.min_y <= test_start[1] <= data.max_y):
+        print("Destination is out of bounds")
+        quit(-1)
 
     # Start x = -73.58983070149999 y = 45.4900685085
     # End x = -73.56 y = 45.50
@@ -73,7 +81,13 @@ if __name__ == "__main__":
 
     """ Generate the path from the start position to the destination position using A* Algorithm """
     aStar = aStar(start, destination, data.obstacles_arr, data)
-    path = aStar.run()
+    # FIXME set timer for the astar run method
+    total_cost, path = aStar.run()
+
+    print("* Total cost of the path found is ", total_cost)
+    print("* Heuristic Estimates at each vertex: \n", aStar.heuristic_estimates_each_vertex[::-1])
+    if max(aStar.heuristic_estimates_each_vertex) < total_cost:
+        print("* The heuristic was admissible")
 
     """ Draw data and grids on the figure plot """
     fig1 = plt.figure(figsize=(15, 15))

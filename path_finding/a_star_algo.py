@@ -18,6 +18,8 @@ class aStar:
         # TODO: CHECK if needed
         # Path from vertices from start to destination
         self.path = []
+        self.total_cost = 0
+        self.heuristic_estimates_each_vertex = []
 
         # FIXME: Check anything related to the open dict and duplicate keys
         # Get the lowest f value for next vertex using priority queue
@@ -71,9 +73,11 @@ class aStar:
                 backtrace_vertex = current_vertex
                 while not backtrace_vertex.node_b == self.start:
                     self.path.append(backtrace_vertex)
+                    self.total_cost += backtrace_vertex.f
+                    self.heuristic_estimates_each_vertex.append(backtrace_vertex.f)
                     backtrace_vertex = backtrace_vertex.parent
                 # return shortest path
-                return self.path[::-1]
+                return self.total_cost, self.path[::-1]
 
             # nodes.clear()
             nodes = list(

@@ -64,6 +64,12 @@ class vertex:
                 self.calculate_g_diagonal(7)
 
             """ the Heuristic function (h) is calculated as the distance between two points on the grid"""
+            """ this heuristic function is admissible because it never overestimates"""
+            """ it calculates straight line distance between two points 
+            which is the shortest distance between the points"""
+            """ thus the heuristic function satisfies h(n) <= c(n) for all nodes n"""
+            """ which implies the heuristic function cost is always lower than the actual cost"""
+
             self.h = inf
             if node_b is not None:
                 row_length = abs(abs(self.node_b.row) - abs(self.destination.row))
@@ -73,9 +79,9 @@ class vertex:
             """ total cost of the new vertex to be created is the sum of g and h """
             self.f = self.g + self.h
 
-            self.f = round(self.f, 3)
-            self.g = round(self.g, 3)
-            self.h = round(self.h, 3)
+            self.f = round(self.f, 4)
+            self.g = round(self.g, 4)
+            self.h = round(self.h, 4)
 
     def calculate_g_straight(self, node_number1: int, node_number2: int):
         self.g = self.parent.g + 1
