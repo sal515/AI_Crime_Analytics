@@ -68,11 +68,12 @@ if __name__ == "__main__":
     # test_destination = (data.lower_x_bound + 1 * gridlen, data.lower_y_bound + 3 * gridlen)
     test_destination = (data.lower_x_bound + 3 * gridlen, data.lower_y_bound + 3 * gridlen)
 
-    if not (data.min_x <= test_destination[0] <= data.max_x and data.min_y <= test_destination[1] <= data.max_y):
+    # FIXME : Fix the bound for the user input according to this too
+    if not (data.min_x <= test_destination[0] <= data.max_x + gridlen and data.min_y <= test_destination[1] <= data.max_y + gridlen):
         print("Destination is out of bounds")
         quit(-1)
 
-    if not (data.min_x <= test_start[0] <= data.max_x and data.min_y <= test_start[1] <= data.max_y):
+    if not (data.min_x <= test_start[0] <= data.max_x + gridlen and data.min_y <= test_start[1] <= data.max_y + gridlen):
         print("Destination is out of bounds")
         quit(-1)
 

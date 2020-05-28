@@ -1,6 +1,7 @@
 import itertools
 import queue as q
 
+import numpy as np
 from numpy import inf
 from collections import defaultdict
 
@@ -49,12 +50,15 @@ class aStar:
         self.update_forbidden_vertices(self.data)
 
         """ Create start vertex no parent and add to closed closed list """
-        if self.start is None:
-            raise Exception("Error: Start vertex was not created")
+        if self.start is None or self.destination is None:
+            raise Exception("Error: Start or Destination vertex was not created")
 
         """ Start vertex is inserted to the open priority queue - for nodes to be visited"""
         start_vertex = vertex(None, self.start, None, self.destination, None, None)
         pq_helper.add_vertex(start_vertex, self.open_priority_queue, self.open_dict)
+
+        """ Creating destination vertex to check if it is blocked or not later on"""
+        destination_vertex = vertex(None, self.destination, None, self.destination, None, None)
 
         while not self.open_priority_queue.empty():
             """ Get the vertex with the lowest f value from the open priority queue/ open list """
@@ -79,7 +83,17 @@ class aStar:
                 return (round(self.total_cost_f, 3), round(self.total_cost_g, 3),
                         round(self.total_cost_h, 3)), self.path[::-1]
 
+            """ Check if the start node is surrounded by blocked nodes, if so then exit"""
+            if not self.is_path_possible(start_vertex):
+                print("start")
+                break
+
+            """ Similar to the last check, do it for the destination node"""
+            if not self.is_path_possible(destination_vertex):
+                break
+
             """ Generate all the adjacent nodes from the current vertex's end node"""
+            # FIXME: node creation, all the none checks need to be fixed to go to the edge of grid
             nodes = list(
                 map(lambda x: node.create(current_vertex.node_b.row + x[0], current_vertex.node_b.col + x[1],
                                           self.data),
@@ -93,10 +107,6 @@ class aStar:
             vertices = list(
                 map(lambda n, i: vertex(current_vertex.node_b, n, current_vertex, self.destination, i, nodes), nodes,
                     index))
-
-            # fixme: Check blocked vertices for start
-
-            # fixme: Check blocked vertices for destination
 
             for v in vertices:
                 """ The vertex is hashed and the hashed key is used to keep a open_dict of vertices"""
@@ -122,6 +132,22 @@ class aStar:
         """ while loop ended and destination was not found """
         print("No Path Found from Start point to Destination point")
         return None, None
+
+    def is_path_possible(self, vertex_to_check: vertex):
+        """ Preliminary check for the starting and destination vertex"""
+        """ Generate all the adjacent nodes for the start or destination point"""
+        """ If all of the adjacent nodes are blocked, then there is no possible path """
+
+        nodes = list(
+            map(lambda x: node.create(vertex_to_check.node_b.row + x[0], vertex_to_check.node_b.col + x[1], self.data). \
+                is_blocked if x is (node.create(vertex_to_check.node_b.row + x[0], vertex_to_check.node_b.col + x[1], \
+                                                self.data)) is not None else 0, self.row_col_possibilities))
+
+        if np.all(np.concatenate((np.array(nodes)[3:5], np.array(nodes)[6:8])) == 1):
+            print("returning false")
+            return False
+
+        return True
 
     """" Helper functions """
 

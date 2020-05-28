@@ -7,6 +7,7 @@ class node:
         """ node cls holds the row and col values of a point on the grid """
         self.row = row
         self.col = col
+        """isblocked == 1 means the node/grid is blocked"""
         self.is_blocked = data.obstacles_arr[data.to_index(self.row, self.col, data.cols)]
 
     @classmethod
