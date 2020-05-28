@@ -16,7 +16,6 @@ class aStar:
         self.data = data
         self.obstacle_array = obstacles_array
 
-        # TODO: CHECK if needed
         """ Path from vertices from start to destination """
         self.path = []
         self.total_cost_f = 0
@@ -78,6 +77,7 @@ class aStar:
                     self.total_cost_h += backtrace_vertex.h
                     self.heuristic_estimates_each_vertex.append(backtrace_vertex.h)
                     backtrace_vertex = backtrace_vertex.parent
+
                 """ Returning shortest path and cumulative costs f,g,h"""
                 return (round(self.total_cost_f, 3), round(self.total_cost_g, 3),
                         round(self.total_cost_h, 3)), self.path[::-1]
@@ -98,10 +98,12 @@ class aStar:
                     index))
 
             # fixme: Check blocked vertices for start
+
             # fixme: Check blocked vertices for destination
 
             for v in vertices:
-                # FIXME ____>
+                """ The vertex is hashed and the hashed key is used to keep a open_dict of vertices"""
+                """ The open_dict allows us to easily check if the vertex is already in the open list/priority queue"""
 
                 v_key = str(hash(v))
 
@@ -110,23 +112,23 @@ class aStar:
                 # if str(hash(v)) in self.forbidden_vertices:
                 #     continue
 
+                """ Checking if the one of the potential vertices are not eligible to be in the open list/priority_queue """
                 if v.f == inf:
                     continue
 
                 if v_key in self.closed_dict:
                     continue
 
-                # Fixme : duplicate keys for the map
                 if v_key in self.open_dict:
                     for node_entry in self.open_dict[v_key]:
                         if v.g > node_entry[2].g:
                             continue
 
-                # ----> Fixme
+                """Add eligible vertices to the open list / priority queue"""
                 pq_helper.add_vertex(v, self.open_priority_queue, self.open_dict)
 
         """ while loop ended and destination was not found """
-        print("No path found to from start point to destination point")
+        print("No Path Found from Start point to Destination point")
         return None, None
 
     """" Helper functions """

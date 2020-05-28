@@ -61,9 +61,12 @@ if __name__ == "__main__":
 
     """ ===== Test coordinates for start and destination for debug ===== """
     gridlen = data.sqr_grid_length + data.sqr_grid_length_pad
+    # gridlen = data.sqr_grid_length
     test_start = (data.lower_x_bound + 0 * gridlen, data.lower_y_bound + 0 * gridlen)
-    test_destination = (data.lower_x_bound + 0 * gridlen, data.lower_y_bound + 2 * gridlen)
+    # test_destination = (data.lower_x_bound + 0 * gridlen, data.lower_y_bound + 2 * gridlen)
     # test_destination = (data.lower_x_bound + 2 * gridlen, data.lower_y_bound + 0 * gridlen)
+    # test_destination = (data.lower_x_bound + 1 * gridlen, data.lower_y_bound + 3 * gridlen)
+    test_destination = (data.lower_x_bound + 3 * gridlen, data.lower_y_bound + 3 * gridlen)
 
     if not (data.min_x <= test_destination[0] <= data.max_x and data.min_y <= test_destination[1] <= data.max_y):
         print("Destination is out of bounds")
@@ -93,7 +96,7 @@ if __name__ == "__main__":
     print("* Heuristic Estimates at each vertex: \n",
           aStar.heuristic_estimates_each_vertex[::-1] if data.path_found else None)
     if data.path_found and data.max_of_heuristic_calc < data.total_path_costs[0]:
-        print("* The heuristic was admissible")
+        print(f"* The heuristic was admissible, since max of h(v), {data.max_of_heuristic_calc} < c(v), {data.total_path_costs[2]} for every vertex, v")
 
     """" === END: Path generation calls and data preparation === """
 
