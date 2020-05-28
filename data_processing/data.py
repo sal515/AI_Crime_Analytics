@@ -6,11 +6,11 @@ from collections.abc import Iterable
 
 
 class data:
-    def __init__(self, square_grid_length, square_grid_length_padding, threshold, data_file_path) -> None:
+    def __init__(self, sqr_grid_length, sqr_grid_length_pad, threshold, data_file_path) -> None:
 
         self.threshold = threshold
-        self.square_grid_length = square_grid_length
-        self.square_grid_length_padding = square_grid_length_padding
+        self.sqr_grid_length = sqr_grid_length
+        self.sqr_grid_length_pad = sqr_grid_length_pad
         # self.start = start
         # self.destination = destination
 
@@ -36,21 +36,21 @@ class data:
 
         # To draw the grids: calculating required rows and cols
         # rows -> are y and cols are x
-        self.cols = int(math.ceil(abs(abs(self.max_x) - abs(self.min_x)) / self.square_grid_length))
-        self.rows = int(math.ceil(abs(abs(self.max_y) - abs(self.min_y)) / self.square_grid_length))
+        self.cols = int(math.ceil(abs(abs(self.max_x) - abs(self.min_x)) / self.sqr_grid_length))
+        self.rows = int(math.ceil(abs(abs(self.max_y) - abs(self.min_y)) / self.sqr_grid_length))
 
         # To get perfect square grids: calculating the bounds
         self.lower_x_bound = self.min_x
-        self.upper_x_bound = self.min_x + (self.cols * self.square_grid_length)
+        self.upper_x_bound = self.min_x + (self.cols * self.sqr_grid_length)
         self.lower_y_bound = self.min_y
-        self.upper_y_bound = self.min_y + (self.rows * self.square_grid_length)
+        self.upper_y_bound = self.min_y + (self.rows * self.sqr_grid_length)
 
         # To draw the grids:, generating the x and y points of the grids
         self.col_points = list(
-            np.arange(self.min_x, (self.upper_x_bound + (self.square_grid_length / 3)), self.square_grid_length))
+            np.arange(self.min_x, (self.upper_x_bound + (self.sqr_grid_length / 3)), self.sqr_grid_length))
 
         self.row_points = list(
-            np.arange(self.min_y, (self.upper_y_bound + (self.square_grid_length / 3)), self.square_grid_length))
+            np.arange(self.min_y, (self.upper_y_bound + (self.sqr_grid_length / 3)), self.sqr_grid_length))
 
         # To draw initial purple patch: calculate the rectangular grid length & width
         self.max_y_length = abs(abs(self.upper_y_bound) - abs(self.min_y))
@@ -159,20 +159,20 @@ class data:
             # Or using numpy to get the same effect
             # x_offset = list(map(lambda x_val: x_val + x_axis_offset, x))
             # y_offset = list(map(lambda y_val: y_val + y_axis_offset, y))
-            grid_col = np.array(x_normalized // self.square_grid_length, dtype=int)
-            grid_row = np.array(y_normalized // self.square_grid_length, dtype=int)
+            grid_col = np.array(x_normalized // self.sqr_grid_length, dtype=int)
+            grid_row = np.array(y_normalized // self.sqr_grid_length, dtype=int)
 
             return grid_row, grid_col
 
         x_normalized = x + self.x_offset
         y_normalized = y + self.y_offset
-        grid_col = x_normalized // self.square_grid_length
-        grid_row = y_normalized // self.square_grid_length
+        grid_col = x_normalized // self.sqr_grid_length
+        grid_row = y_normalized // self.sqr_grid_length
         return int(grid_row), int(grid_col)
 
     def to_coordinate_from_row_col(self, row_col: tuple):
-        row_coord = (self.lower_x_bound + row_col[1] * self.square_grid_length)
-        col_coord = (self.lower_y_bound + row_col[0] * self.square_grid_length)
+        row_coord = (self.lower_x_bound + row_col[1] * self.sqr_grid_length)
+        col_coord = (self.lower_y_bound + row_col[0] * self.sqr_grid_length)
         return row_coord, col_coord
 
     # view the crime rate array as a matrix

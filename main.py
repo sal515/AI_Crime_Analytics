@@ -18,9 +18,10 @@ def sanitize_grid_length(sqr_grid_length):
 
 
 if __name__ == "__main__":
-    """ Debug variables"""
-    debug = 0
+    """ Debug variables """
+    debug = 1
     test_grid_size = "0.002"
+    test_grid_size = "0.010"
     test_threshold = 50
 
     """ Main Driver file imports """
@@ -32,7 +33,7 @@ if __name__ == "__main__":
     from path_finding.a_star_algo import aStar
     import data_processing.visualize as visualize
 
-    """ Constant Path Variables"""
+    """ Constant Path Variables """
     shapes_data_path = "data\\Shape\\crime_dt.shp"
     figures_dir_path = "figures\\"
 
@@ -44,9 +45,9 @@ if __name__ == "__main__":
 
     # Fixme: Why is everything blocked for threshold < 50 and 0.001 grids
 
-    # ====== logic ======
+    """ Logic starts """
 
-    # Initialize all the data arrays to represent crime matrix
+    """ Crime data processing and matrices generated for grid plotting & statistics calculation """
     data = dt.data(sqr_grid_length, sqr_grid_length_padding, threshold, shapes_data_path)
     data.update_crime_rate_array()
     data.sort_crime_data_array()
@@ -79,13 +80,12 @@ if __name__ == "__main__":
     ax = fig1.add_subplot(1, 1, 1)
 
     visualize = visualize.visualize()
-    # visualize.plot_crime_coordinates(plt, data)
+    visualize.plot_crime_coordinates(plt, data)
     visualize.draw_initial_grids(data, ax)
     visualize.draw_grid_lines(plt, data)
     visualize.draw_all_blocked_grids(data, ax)
     visualize.draw_path(data, path, ax)
     visualize.save_figure(plt, "all_crime_data.png", figures_dir_path)
-    visualize.plot_show(plt, threshold)
+    visualize.plot_show(plt, data)
 
-    # ===== end of program =====
     print("=== program terminated ===")
