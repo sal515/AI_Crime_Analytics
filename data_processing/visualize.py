@@ -24,7 +24,7 @@ class visualize:
         plt.show()
 
     @staticmethod
-    def draw_path(data: object, path: object, ax: object, color: object = "limegreen") -> object:
+    def draw_path(data, path, ax, color: str = "limegreen") -> None:
         """ Draw the path from the start position to the destination position on the grid plot
         :param data:
         :param path:
@@ -54,7 +54,8 @@ class visualize:
         for index in range(0, data.obstacles_arr.__len__()):
             self.draw_a_grid(index, data, ax, color, annotate_row_col)
 
-    def draw_a_grid(self, index, data: dp.data, ax, color: str, annotate_row_col: bool):
+    @staticmethod
+    def draw_a_grid(index, data: dp.data, ax, color: str, annotate_row_col: bool):
         """ Draw a grid by itself - it could be a blocked or non-blocked grid based on provided inputs """
         row_col = data.to_row_col_from_index(index, data.cols)
         grid_loc = (
@@ -78,17 +79,20 @@ class visualize:
 
         ax.add_patch(grid)
 
-    def plot_crime_coordinates(self, plt, data):
+    @staticmethod
+    def plot_crime_coordinates(plt, data):
         """ To see the data points from the shapate file - Plots all the data points on the plot """
         plt.plot(data.x, data.y, ".")
 
-    def draw_grid_lines(self, plt, data):
+    @staticmethod
+    def draw_grid_lines(plt, data):
         """ Draw the grid lines on the plot to visualize the grids """
         for i in data.col_points:
             plt.axvline(x=i)
         for i in data.row_points:
             plt.axhline(y=i)
 
-    def save_figure(self, plt, figureName, figures_dir_path):
+    @staticmethod
+    def save_figure(plt, figureName, figures_dir_path):
         """ store the figure in the given dir path and use the filename with extension provided as func input"""
         plt.savefig("".join([figures_dir_path, figureName]))

@@ -128,6 +128,7 @@ class aStar:
                 node_b: node = node.create(r, c + 1, data)
                 forbidden_vertex = vertex(node_a, node_b, None, None, None, None)
                 self.forbidden_vertices[str(hash(forbidden_vertex))] = ((r, c), (r, c + 1))
+                # self.forbidden_vertices[str(hash(forbidden_vertex))] = forbidden_vertex
 
         for c in (0, self.data.cols - 1):
             for r in range(0, self.data.rows - 1):
@@ -135,6 +136,7 @@ class aStar:
                 node_b: node = node.create(r + 1, c, data)
                 forbidden_vertex = vertex(node_a, node_b, None, None, None, None)
                 self.forbidden_vertices[str(hash(forbidden_vertex))] = ((r, c), (r + 1, c))
+                # self.forbidden_vertices[str(hash(forbidden_vertex))] = forbidden_vertex
 
     def update_closed_list(self, current_vertex):
         current_vertex_key = str(hash(current_vertex))
