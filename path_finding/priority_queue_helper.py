@@ -7,8 +7,7 @@ from collections import defaultdict
 
 class pq_helper:
     counter = itertools.count()
-
-    # pq = q.PriorityQueue(-1) - infinite priority queue size
+    # eg. pq = q.PriorityQueue(-1) - infinite priority queue size
 
     @staticmethod
     def add_vertex(vertex: vtx, pq: q.PriorityQueue, vertex_finder_dict: defaultdict) -> None:

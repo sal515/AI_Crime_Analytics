@@ -1,17 +1,12 @@
-import math
-from functools import total_ordering
 from data_processing.data import data as dt
 
 
-# @total_ordering
 class node:
 
     def __init__(self, row: int, col: int, data: dt) -> None:
+        """ node cls holds the row and col values of a point on the grid """
         self.row = row
         self.col = col
-        # self.x, self.y = data.to_coordinate_from_row_col((self.row, self.col))
-        # print(self.row, self.col)
-
         self.is_blocked = data.obstacles_arr[data.to_index(self.row, self.col, data.cols)]
 
     @classmethod
@@ -52,6 +47,3 @@ class node:
             return ""
 
         return f" row_col: {(self.row, self.col)}"
-
-    # def __hash__(self):
-    #     return hash(self.position)

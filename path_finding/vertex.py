@@ -5,20 +5,27 @@ import math
 
 class vertex:
 
-    def __init__(self, node_a: node, node_b: node, parent, destination: node, vertex_pos: int, possible_nodes: [node]) -> None:
+    def __init__(self, node_a: node, node_b: node, parent, destination: node, vertex_pos: int,
+                 possible_nodes: [node]) -> None:
+        """ vertex cls holds the start node and and end node of a vertex on the grid """
+
         self.parent = parent
         self.destination: node = destination
 
-        self.vertex_pos = vertex_pos
+        """ list of possible nodes around the end of a vertex is used to calculate cost g """
         self.possible_nodes: [node] = possible_nodes
+        self.vertex_pos = vertex_pos
 
+        """ node a is the start node of a vertex and node b is the end node of the vertex"""
         self.node_a: node = node_a
         self.node_b: node = node_b
 
+        """ used to create the initial vertex, since the vertex does not have a parent vertex  """
         self.g = 0
         self.h = 0
         self.f = 0
 
+        """ logic to calculate the cost g, to create a new vertex composed of node_a to node_b"""
         if self.parent is not None and self.vertex_pos is not None:
             if self.vertex_pos == 0:
                 # diagonal top left
@@ -56,12 +63,14 @@ class vertex:
                 # diagonal bottom right
                 self.calculate_g_diagonal(7)
 
+            """ the Heuristic function (h) is calculated as the distance between two points on the grid"""
             self.h = inf
             if node_b is not None:
                 row_length = abs(abs(self.node_b.row) - abs(self.destination.row))
                 col_length = abs(abs(self.node_b.col) - abs(self.destination.col))
                 self.h = math.sqrt(pow(row_length, 2) + pow(col_length, 2))
 
+            """ total cost of the new vertex to be created is the sum of g and h """
             self.f = self.g + self.h
 
             self.f = round(self.f, 3)
@@ -106,10 +115,7 @@ class vertex:
         return hash(self.node_a + self.node_b)
 
     def __repr__(self) -> str:
-        return f" node_a: {self.node_a}, node_b: {self.node_b}, f_g_h: {(self.f, self.g, self.h)}, parent: {(self.parent)}\n"
-
-    # def __repr__(self) -> str:
-    #     return f" node_a: {self.node_a}, node_b: {self.node_b}, f_g_h: {(self.f, self.g, self.h)}, parent: {self.parent}, destination: {self.destination}, vertex_pos: {self.vertex_pos} "
+        return f" node_a: {self.node_a}, node_b: {self.node_b}, f_g_h: {(self.f, self.g, self.h)}, parent: {self.parent}\n"
 
 
 # TEST CODE
