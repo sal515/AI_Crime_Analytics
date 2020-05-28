@@ -98,7 +98,7 @@ class data:
             self.crime_rate_arr[self.to_index(self.grid_row[i], self.grid_col[i], self.cols)] += 1
 
     # Sort crime array for threshold in descending order
-    def sort_crime_data_arr(self):
+    def sort_crime_data_array(self):
         self.crime_rate_arr_sorted = np.sort(self.crime_rate_arr)[::-1]
 
     # Calculating crime statistics
@@ -109,7 +109,7 @@ class data:
 
     # Updating blocked and non-blocked areas on matrix
     def update_obstacles_arr(self):
-        self.sort_crime_data_arr()
+        self.sort_crime_data_array()
         self.median = np.median(self.crime_rate_arr_sorted)
         self.obstacles_arr = self.crime_rate_arr.copy()
 

@@ -17,16 +17,24 @@ class visualize:
         # save_figure(plt, "all_crime_data.png")
         plt.show()
 
-    # # To view crime rate grids: Initially plot all the grids using the safe color
-    def draw_initial_grids(self, data: dp.data, ax, color="purple"):
-        for index in range(0, data.obstacles_arr.__len__()):
-            self.draw_a_grid(index, data, ax, color)
+    """ Draw the path from the start postion to the destination position on the grid plot """
+    def draw_path(self, data, path, ax, color="limegreen"):
+        for v in path:
+            start_pos = data.to_coordinate_from_row_col((v.node_a.row, v.node_a.col))
+            end_pos = data.to_coordinate_from_row_col((v.node_b.row, v.node_b.col))
+            ax.add_patch(patches.ConnectionPatch(start_pos, end_pos, "data", "data", arrowstyle="-", shrinkA=1, shrinkB=1,
+                                               dpi_cor=10, color=color, linewidth="8"))
 
     # To view the crime rates: Draw all the blocked grids as specified color
     def draw_all_blocked_grids(self, data: dp.data, ax, color="yellow"):
         for index in range(0, data.obstacles_arr.__len__()):
             if data.obstacles_arr[index]:
                 self.draw_a_grid(index, data, ax, color)
+
+    # # To view crime rate grids: Initially plot all the grids using the safe color
+    def draw_initial_grids(self, data: dp.data, ax, color="purple"):
+        for index in range(0, data.obstacles_arr.__len__()):
+            self.draw_a_grid(index, data, ax, color)
 
     def draw_a_grid(self, index, data: dp.data, ax, color):
 
@@ -42,7 +50,8 @@ class visualize:
         cy = ry + grid.get_height() / 2.0
         # ax.annotate(f"({row_col[0], row_col[1]})", (cx, cy), color='w',  fontsize=8, ha='center',va='center')
 
-        ax.annotate(f"{row_col[0], row_col[1]}", (cx, cy), color='red', weight='bold', fontsize=10, ha='center',va='center')
+        ax.annotate(f"{row_col[0], row_col[1]}", (cx, cy), color='red', weight='bold', fontsize=10, ha='center',
+                    va='center')
 
         ax.add_patch(grid)
 
