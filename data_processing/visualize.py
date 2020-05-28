@@ -19,7 +19,9 @@ class visualize:
         y-axis / rows """)
         plt.title(f"""Crime rate plot : {data.threshold}% threshold
         grid_size = {data.sqr_grid_length}, threshold_value= {round(data.threshold_val, 2)} 
-        median = {round(data.median, 2)}, std_dev={round(data.std_dev, 2)}, avg={round(data.average, 2)}
+        median = {round(data.median, 2)}, std_dev={round(data.std_dev, 2)}, avg={round(data.average, 2)},
+        actual_costs of (f,g,h)={data.total_path_costs if data.path_found else "-"}
+        max_heuristic_calculated={data.max_of_heuristic_calc if data.path_found else "-"}
         """)
         plt.show()
 

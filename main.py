@@ -57,12 +57,13 @@ if __name__ == "__main__":
     """ Print all the generated data and matrices """
     data.print()
 
+    """" === START: Path generation calls and data preparation === """
+
     """ ===== Test coordinates for start and destination for debug ===== """
     gridlen = data.sqr_grid_length + data.sqr_grid_length_pad
-    test_start = (data.lower_x_bound + 0 * gridlen, data.lower_y_bound + 1 * gridlen)
-    # test_destination = (data.lower_x_bound + 11 * 0.0020001, data.lower_y_bound + 2 * 0.002001)
-    # test_destination = (data.lower_x_bound + 18 * 0.0020001, data.lower_y_bound + 6 * 0.002001)
-    test_destination = (data.lower_x_bound + 1 * gridlen, data.lower_y_bound + 3 * gridlen)
+    test_start = (data.lower_x_bound + 0 * gridlen, data.lower_y_bound + 0 * gridlen)
+    test_destination = (data.lower_x_bound + 0 * gridlen, data.lower_y_bound + 2 * gridlen)
+    # test_destination = (data.lower_x_bound + 2 * gridlen, data.lower_y_bound + 0 * gridlen)
 
     if not (data.min_x <= test_destination[0] <= data.max_x and data.min_y <= test_destination[1] <= data.max_y):
         print("Destination is out of bounds")
@@ -83,12 +84,18 @@ if __name__ == "__main__":
     """ Generate the path from the start position to the destination position using A* Algorithm """
     aStar = aStar(start, destination, data.obstacles_arr, data)
     # FIXME: set timer for the astar run method
-    total_cost, path = aStar.run()
 
-    print("* Total cost of the path found is ", total_cost)
-    print("* Heuristic Estimates at each vertex: \n", aStar.heuristic_estimates_each_vertex[::-1])
-    if max(aStar.heuristic_estimates_each_vertex) < total_cost:
+    """Calculating the total heuristic and total actual costs of the path """
+    data.total_path_costs, path = aStar.run()
+    data.max_of_heuristic_calc = max(aStar.heuristic_estimates_each_vertex) if data.path_found else None
+
+    print("* Cumulative costs of the path, (f, g, h): ", data.total_path_costs)
+    print("* Heuristic Estimates at each vertex: \n",
+          aStar.heuristic_estimates_each_vertex[::-1] if data.path_found else None)
+    if data.path_found and data.max_of_heuristic_calc < data.total_path_costs[0]:
         print("* The heuristic was admissible")
+
+    """" === END: Path generation calls and data preparation === """
 
     """ Draw data and grids on the figure plot """
     fig1 = plt.figure(figsize=(15, 15))
@@ -100,8 +107,9 @@ if __name__ == "__main__":
     visualize.draw_initial_grids(data, ax)
     visualize.draw_grid_lines(plt, data)
     visualize.draw_all_blocked_grids(data, ax)
-    visualize.draw_path(data, path, ax)
+    if data.path_found:
+        visualize.draw_path(data, path, ax)
     visualize.save_figure(plt, "all_crime_data.png", figures_dir_path)
     visualize.plot_show(plt, data)
 
-    print("=== program terminated ===")
+    print("\n=== program terminated ===")

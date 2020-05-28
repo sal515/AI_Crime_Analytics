@@ -1,12 +1,13 @@
 import itertools
 import queue as q
+
 from numpy import inf
 from collections import defaultdict
 
 from path_finding.node import node
 from path_finding.vertex import vertex
-from path_finding.priority_queue_helper import pq_helper
 from data_processing.data import data as dt
+from path_finding.priority_queue_helper import pq_helper
 
 
 class aStar:
@@ -16,70 +17,72 @@ class aStar:
         self.obstacle_array = obstacles_array
 
         # TODO: CHECK if needed
-        # Path from vertices from start to destination
+        """ Path from vertices from start to destination """
         self.path = []
-        self.total_cost = 0
+        self.total_cost_f = 0
+        self.total_cost_g = 0
+        self.total_cost_h = 0
         self.heuristic_estimates_each_vertex = []
 
         # FIXME: Check anything related to the open dict and duplicate keys
-        # Get the lowest f value for next vertex using priority queue
+        """ Get the lowest f value for next vertex using priority queue """
         self.open_priority_queue = q.PriorityQueue(-1)
         self.open_dict = defaultdict(list)
 
-        # List containing visited nodes to prevent cycling between visited nodes
+        """ List containing visited nodes to prevent cycling between visited nodes """
         self.closed_list = []
         self.closed_dict = {}
 
-        # Forbidden vertices list to prevent using such vertices
+        """ Forbidden vertices list to prevent using such vertices """
         self.forbidden_vertices = {}
 
-        # Row and column values are generated from provided x and y coordinates
+        """ Row and column values are generated from provided x and y coordinates """
         self.start_row, self.start_col = data.to_row_col_from_coord(start_xy[0], start_xy[1])
         self.destination_row, self.destination_col = data.to_row_col_from_coord(destination_xy[0], destination_xy[1])
 
-        # Created the start node and destination node to use in the vertices generation
+        """ Created the start node and destination node to use in the vertices generation """
         self.start: node = node.create(self.start_row, self.start_col, data)
         self.destination: node = node.create(self.destination_row, self.destination_col, data)
 
-        # To get all possible adjacent nodes from a node - list of possible row and column translation
+        """ To get all possible adjacent nodes from a node - list of possible row and column translation """
         self.row_col_possibilities = [(1, -1), (1, 0), (1, 1), (0, -1), (0, 0), (0, 1), (-1, -1), (-1, 0), (-1, 1)]
 
     def run(self):
         # FIXME
-        # insert forbidden/blocked vertices to the closed list
-        # self.update_forbidden_nodes()
+        """ insert forbidden vertices to the closed list """
         self.update_forbidden_vertices(self.data)
 
-        # Create start vertex no parent and add to closed closed list
+        """ Create start vertex no parent and add to closed closed list """
         if self.start is None:
             raise Exception("Error: Start vertex was not created")
 
+        """ Start vertex is inserted to the open priority queue - for nodes to be visited"""
         start_vertex = vertex(None, self.start, None, self.destination, None, None)
         pq_helper.add_vertex(start_vertex, self.open_priority_queue, self.open_dict)
 
         while not self.open_priority_queue.empty():
-            # get current vertex from the openList with lowest f
-            # remove the current vertex from the open list & dict
+            """ Get the vertex with the lowest f value from the open priority queue/ open list """
             current_vertex: vertex = pq_helper.pop_vertex(self.open_priority_queue, self.open_dict)
 
-            # print(current_vertex)
-
-            # FIXME - Should be good now??
-            # add the current vertex to the closed list & dict
+            """ add the current vertex removed from the open list to the closed list & dict """
             self.update_closed_list(current_vertex)
 
+            """ Destination found if the vertex has the destination node, return path """
             if current_vertex.node_b == self.destination:
-                # FIXME
+                self.data.path_found = True
                 backtrace_vertex = current_vertex
                 while not backtrace_vertex.node_b == self.start:
                     self.path.append(backtrace_vertex)
-                    self.total_cost += backtrace_vertex.f
-                    self.heuristic_estimates_each_vertex.append(backtrace_vertex.f)
+                    self.total_cost_f += backtrace_vertex.f
+                    self.total_cost_g += backtrace_vertex.g
+                    self.total_cost_h += backtrace_vertex.h
+                    self.heuristic_estimates_each_vertex.append(backtrace_vertex.h)
                     backtrace_vertex = backtrace_vertex.parent
-                # return shortest path
-                return self.total_cost, self.path[::-1]
+                """ Returning shortest path and cumulative costs f,g,h"""
+                return (round(self.total_cost_f, 3), round(self.total_cost_g, 3),
+                        round(self.total_cost_h, 3)), self.path[::-1]
 
-            # nodes.clear()
+            """ Generate all the adjacent nodes from the current vertex's end node"""
             nodes = list(
                 map(lambda x: node.create(current_vertex.node_b.row + x[0], current_vertex.node_b.col + x[1],
                                           self.data),
@@ -88,11 +91,14 @@ class aStar:
             # Test print all nodes
             # [print(i) for i in zip(enumerate(nodes)) if i is not None]
 
-            # vertices.clear()
+            """ Generate all the adjacent vertices from the current vertex using adjacent nodes"""
             index = itertools.count()
             vertices = list(
                 map(lambda n, i: vertex(current_vertex.node_b, n, current_vertex, self.destination, i, nodes), nodes,
                     index))
+
+            # fixme: Check blocked vertices for start
+            # fixme: Check blocked vertices for destination
 
             for v in vertices:
                 # FIXME ____>
@@ -116,10 +122,14 @@ class aStar:
                         if v.g > node_entry[2].g:
                             continue
 
-                pq_helper.add_vertex(v, self.open_priority_queue, self.open_dict)
                 # ----> Fixme
+                pq_helper.add_vertex(v, self.open_priority_queue, self.open_dict)
 
-    # === Helper functions ===
+        """ while loop ended and destination was not found """
+        print("No path found to from start point to destination point")
+        return None, None
+
+    """" Helper functions """
 
     def update_forbidden_vertices(self, data: dt):
         for r in (0, self.data.rows - 1):
@@ -127,7 +137,8 @@ class aStar:
                 node_a: node = node.create(r, c, data)
                 node_b: node = node.create(r, c + 1, data)
                 forbidden_vertex = vertex(node_a, node_b, None, None, None, None)
-                self.forbidden_vertices[str(hash(forbidden_vertex))] = ((r, c), (r, c + 1))
+                self.update_closed_list(forbidden_vertex)
+                # self.forbidden_vertices[str(hash(forbidden_vertex))] = ((r, c), (r, c + 1))
                 # self.forbidden_vertices[str(hash(forbidden_vertex))] = forbidden_vertex
 
         for c in (0, self.data.cols - 1):
@@ -135,7 +146,8 @@ class aStar:
                 node_a: node = node.create(r, c, data)
                 node_b: node = node.create(r + 1, c, data)
                 forbidden_vertex = vertex(node_a, node_b, None, None, None, None)
-                self.forbidden_vertices[str(hash(forbidden_vertex))] = ((r, c), (r + 1, c))
+                self.update_closed_list(forbidden_vertex)
+                # self.forbidden_vertices[str(hash(forbidden_vertex))] = ((r, c), (r + 1, c))
                 # self.forbidden_vertices[str(hash(forbidden_vertex))] = forbidden_vertex
 
     def update_closed_list(self, current_vertex):
