@@ -27,7 +27,7 @@ class data:
         self.max_x = max(self.x)
         self.max_y = max(self.y)
 
-        # FIXME
+        # FIXME : Final clean
         # GTK: Alternative of finding min and max of x and y using pandas
         # By creating a polygon using all the crime data points
         # poly = polygon(x_y_pair)
@@ -82,7 +82,7 @@ class data:
         self.max_of_heuristic_calc: float = None
         self.path_found: bool = False
 
-        # FIXME: (Not required) Fix the functions to store the data as file
+        # FIXME: Final clean (Not required) Fix the functions to store the data as file
         # Store file/Save files
         # To save crime data as CSV format to read the data
         # self.crime_data.to_csv("".join([figure_dir_path, "crime_data.csv"]), index=True)

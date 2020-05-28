@@ -44,7 +44,7 @@ class aStar:
         self.row_col_possibilities = [(1, -1), (1, 0), (1, 1), (0, -1), (0, 0), (0, 1), (-1, -1), (-1, 0), (-1, 1)]
 
     def run(self):
-        # FIXME
+        # FIXME : the forbidden nodes on top and right has to be added
         """ insert forbidden vertices to the closed list """
         self.update_forbidden_vertices(self.data)
 
@@ -103,11 +103,6 @@ class aStar:
                 """ The open_dict allows us to easily check if the vertex is already in the open list/priority queue"""
 
                 v_key = str(hash(v))
-
-                # FIXME: Check if the node is within range
-                # FIXME: Check if the node is blocked or not
-                # if str(hash(v)) in self.forbidden_vertices:
-                #     continue
 
                 """ Checking if the one of the potential vertices are not eligible to be in the open list/priority_queue """
                 if v.f == inf:
