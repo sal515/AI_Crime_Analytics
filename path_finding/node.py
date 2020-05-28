@@ -8,12 +8,16 @@ class node:
         self.row = row
         self.col = col
         """isblocked == 1 means the node/grid is blocked"""
-        self.is_blocked = data.obstacles_arr[data.to_index(self.row, self.col, data.cols)]
+        self.index = data.to_index(self.row, self.col, data.cols)
+        self.is_blocked = data.obstacles_arr[self.index] if self.index <= (data.rows * data.cols) - 1 else None
+
+        """ isNone is used for the padded nodes to reach the border vertices, otw the algorithm would avoid going to the boundary"""
+        self.isNone: bool = True if self.is_blocked is None else False
 
     @classmethod
     def create(cls, row: int, col: int, data: dt):
         """Create a node or return None if the row and col provided are invalid"""
-        if not (data.rows > row >= 0 and data.cols > col >= 0):
+        if not (data.rows >= row >= 0 and data.cols >= col >= 0):
             return None
 
         return cls(row, col, data)
@@ -23,6 +27,7 @@ class node:
             raise Exception("Possible? ")
 
         elif self is None and other.node_a is not None:
+            raise Exception("Possible? ")
             return False
 
         elif self is not None and other is None:
@@ -35,6 +40,7 @@ class node:
             raise Exception("Possible? ")
 
         elif self is None and other is not None:
+            raise Exception("Possible? ")
             return other.row, other.col
 
         elif self is not None and other is None:

@@ -19,6 +19,7 @@ def sanitize_grid_length(sqr_grid_length):
 
 if __name__ == "__main__":
     """ Debug variables """
+    # FIXME : Set debug to 0 before submission
     debug = 1
     test_grid_size = "0.002"
     test_grid_size = "0.010"
@@ -60,15 +61,18 @@ if __name__ == "__main__":
     """" === START: Path generation calls and data preparation === """
 
     """ ===== Test coordinates for start and destination for debug ===== """
+    # FIXME: Final clear test values
     gridlen = data.sqr_grid_length + data.sqr_grid_length_pad
     # gridlen = data.sqr_grid_length
     test_start = (data.lower_x_bound + 0 * gridlen, data.lower_y_bound + 0 * gridlen)
-    # test_destination = (data.lower_x_bound + 0 * gridlen, data.lower_y_bound + 2 * gridlen)
+    # test_start = (data.lower_x_bound + 1 * gridlen, data.lower_y_bound + 2 * gridlen)
+    test_destination = (data.lower_x_bound + 0 * gridlen, data.lower_y_bound + 3 * gridlen)
     # test_destination = (data.lower_x_bound + 2 * gridlen, data.lower_y_bound + 0 * gridlen)
+    # test_destination = (data.lower_x_bound + 2 * gridlen, data.lower_y_bound + 2 * gridlen)
     # test_destination = (data.lower_x_bound + 1 * gridlen, data.lower_y_bound + 3 * gridlen)
-    test_destination = (data.lower_x_bound + 3 * gridlen, data.lower_y_bound + 3 * gridlen)
+    # test_destination = (data.lower_x_bound + 4 * gridlen, data.lower_y_bound + 4 * gridlen)
+    # test_destination = (data.lower_x_bound + 4 * gridlen, data.lower_y_bound + 3 * gridlen)
 
-    # FIXME : Fix the bound for the user input according to this too
     if not (data.min_x <= test_destination[0] <= data.max_x + gridlen and data.min_y <= test_destination[1] <= data.max_y + gridlen):
         print("Destination is out of bounds")
         quit(-1)
@@ -103,6 +107,7 @@ if __name__ == "__main__":
 
     """ Draw data and grids on the figure plot """
     fig1 = plt.figure(figsize=(15, 15))
+    # fig1 = plt.figure(figsize=(25, 25))
     ax = fig1.add_subplot(1, 1, 1)
 
     visualize = visualize.visualize()

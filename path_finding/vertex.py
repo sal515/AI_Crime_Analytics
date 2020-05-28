@@ -85,21 +85,45 @@ class vertex:
 
     def calculate_g_straight(self, node_number1: int, node_number2: int):
         self.g = self.parent.g + 1
-        if (self.possible_nodes[node_number1] is None or self.possible_nodes[node_number1].is_blocked) and \
-                (self.possible_nodes[node_number2] is None or self.possible_nodes[node_number2].is_blocked):
+
+        # checks blocked nodes
+        if not self.is_none(node_number1) and not self.is_none(node_number2):
+
+            if self.is_blocked(node_number1) and self.is_blocked(node_number2):
+                self.g = inf
+
+            elif self.is_blocked(node_number1) and not self.is_blocked(node_number2):
+                self.g = self.parent.g + 1.3
+
+            elif not self.is_blocked(node_number1) and self.is_blocked(node_number2):
+                self.g = self.parent.g + 1.3
+
+        # checks none nodes
+        elif self.is_none(node_number1) and self.is_none(node_number2):
             self.g = inf
 
-        elif (self.possible_nodes[node_number1] is None or self.possible_nodes[node_number1].is_blocked) and \
-                (self.possible_nodes[node_number2] is not None or not self.possible_nodes[node_number2].is_blocked):
-            self.g = self.parent.g + 1.3
+        elif self.is_none(node_number1) and not self.is_none(node_number2):
+            # left boundary edge
+            self.g = inf
 
-        elif (self.possible_nodes[node_number1] is not None or not self.possible_nodes[node_number1].is_blocked) and \
-                (self.possible_nodes[node_number2] is None or self.possible_nodes[node_number2].is_blocked):
-            self.g = self.parent.g + 1.3
+        elif not self.is_none(node_number1) and self.is_none(node_number2):
+            # right boundary edge
+            self.g = inf
+
+
+    def is_blocked(self, node_number):
+        return self.possible_nodes[node_number].is_blocked
+
+    def is_none(self, node_number):
+        return self.possible_nodes[node_number] is None or self.possible_nodes[node_number].isNone
 
     def calculate_g_diagonal(self, node_number: int):
         self.g = self.parent.g + 1.5
-        if self.possible_nodes[node_number] is None or self.possible_nodes[node_number].is_blocked:
+        if not self.is_none(node_number):
+            if self.possible_nodes[node_number].is_blocked:
+                self.g = inf
+
+        elif self.is_none(node_number):
             self.g = inf
 
     def __eq__(self, other):

@@ -24,7 +24,6 @@ class aStar:
         self.total_cost_h = 0
         self.heuristic_estimates_each_vertex = []
 
-        # FIXME: Check anything related to the open dict and duplicate keys
         """ Get the lowest f value for next vertex using priority queue """
         self.open_priority_queue = q.PriorityQueue(-1)
         self.open_dict = defaultdict(list)
@@ -45,10 +44,6 @@ class aStar:
         self.row_col_possibilities = [(1, -1), (1, 0), (1, 1), (0, -1), (0, 0), (0, 1), (-1, -1), (-1, 0), (-1, 1)]
 
     def run(self):
-        # FIXME : the forbidden nodes on top and right has to be added
-        """ insert forbidden vertices to the closed list """
-        self.update_forbidden_vertices(self.data)
-
         """ Create start vertex no parent and add to closed closed list """
         if self.start is None or self.destination is None:
             raise Exception("Error: Start or Destination vertex was not created")
@@ -93,12 +88,12 @@ class aStar:
                 break
 
             """ Generate all the adjacent nodes from the current vertex's end node"""
-            # FIXME: node creation, all the none checks need to be fixed to go to the edge of grid
             nodes = list(
                 map(lambda x: node.create(current_vertex.node_b.row + x[0], current_vertex.node_b.col + x[1],
                                           self.data),
                     self.row_col_possibilities))
 
+            # FIXME : Clean for final sub
             # Test print all nodes
             # [print(i) for i in zip(enumerate(nodes)) if i is not None]
 

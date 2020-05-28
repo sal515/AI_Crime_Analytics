@@ -27,21 +27,23 @@ class ui:
     def ask_for_position(data: dt, position_name: str):
         print("")
 
-        x = input(f" {position_name} position : Please provide {data.min_x} <= x <= {data.max_x} coordinate: ")
+        x = input(
+            f" {position_name} position : Please provide {data.min_x} <= x <= {data.max_x + data.sqr_grid_length_pad} coordinate: ")
 
         while not ui.x_y_sanitization_limits_check(data, x, True):
             print(f"Invalid x = {x} provided")
 
             x = input(
-                f"Please re-enter the x value between {data.min_x} <= x <= {data.max_x}")
+                f"Please re-enter the x value between {data.min_x} <= x <= {data.max_x + data.sqr_grid_length_pad}")
 
-        y = input(f"{position_name} position: Please provide {data.min_y} <= y <= {data.max_y} coordinate: ")
+        y = input(
+            f"{position_name} position: Please provide {data.min_y} <= y <= {data.max_y + data.sqr_grid_length_pad} coordinate: ")
 
         while not ui.x_y_sanitization_limits_check(data, y, False):
             print(f"Invalid y = {y} provided")
 
             y = input(
-                f"Please re-enter the y value between {data.min_y} <= y <= {data.max_y}")
+                f"Please re-enter the y value between {data.min_y} <= y <= {data.max_y + data.sqr_grid_length_pad}")
 
         return tuple([float(x), float(y)])
 
@@ -49,10 +51,12 @@ class ui:
     def x_y_sanitization_limits_check(data, x_or_y, is_x):
         if is_x:
             return x_or_y.replace(".", "").replace(",", "").replace("-",
-                                                                    "").isdigit() and data.min_x <= float(x_or_y) <= data.max_x
+                                                                    "").isdigit() and data.min_x <= float(
+                x_or_y) <= data.max_x + data.sqr_grid_length_pad
 
         return x_or_y.replace(".", "").replace(",", "").replace("-",
-                                                                "").isdigit() and data.min_y <= float(x_or_y) <= data.max_y
+                                                                "").isdigit() and data.min_y <= float(
+            x_or_y) <= data.max_y + data.sqr_grid_length_pad
 
 
 # TEST CODE
