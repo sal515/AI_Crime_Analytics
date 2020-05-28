@@ -15,7 +15,7 @@ class visualize:
         """
         plt.xlabel("""Longitude
         x-axis / columns """)
-        plt.ylabel("""
+        plt.ylabel("""Latitude
         y-axis / rows """)
         plt.title(f"""Crime rate plot : {data.threshold}% threshold
         grid_size = {data.sqr_grid_length}, threshold_value= {round(data.threshold_val, 2)} 
