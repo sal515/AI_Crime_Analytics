@@ -1,7 +1,7 @@
 # Environment Requirements:
 * Python 3.7.2 (Tested on)
 * Windows 10 Home x64 (Tested on)
-* Miniconda (Install Instructions provided in **Installations
+* Miniconda3 (Install Instructions provided in **Installations
  Instructions** section)
     * conda 4.8.3
 
@@ -11,56 +11,69 @@
 * numpy
 
 # Installation Instructions
-### Install Miniconda: (to be able to use conda virtual environment)
-* Download link and install: 
+### Install Miniconda3: (to be able to use conda virtual environment)
+* Download link and install, (Use: "Just Me" option when asked): 
 
         https://docs.conda.io/en/latest/miniconda.html
 
-* Add following paths, to the environment variable path (windows 10):
+* (Windows 10) For installation with default settings, add the following paths, to the environment variable called "path" :
+    * If "Just Me" option was used to install minconda3, then please add the following paths with your computer name. Otherwise, the miniconda3 has to be found before adding the paths:
 
-        C:\Users\Sal\miniconda3
-        
-        C:\Users\Sal\miniconda3\Scripts
+            C:\Users\<username or path to miniconda dir>\miniconda3
+            
+            C:\Users\<username or path to miniconda dir>\miniconda3\Scripts
         
 * Update conda from the command prompt: (to test if it is working): 
 
         conda update conda
        
 * If HTTP error occurs (I got this issue):
-    * Install openSSL module
+    * Install Win64 OpenSSL v1.1.1g
         * Download link: 
         
                 https://slproweb.com/products/Win32OpenSSL.html
                 
     * Please run the **"update conda"** command provided in the previous step to test if the issue is resolved. 
 
-### Install Geopandas: (conda virtual environment needs to be activated before installation)
-* Setup command using conda manager: 
-
-        conda install geopandas  
-    * Reference link: https://geopandas.org/install.html
 
 # Run Instructions
 ### Pe-requisite: Create conda virtual environment for the project
-* Go to project directory
+* Open a windows command prompt/terminal
+
+* Go to project directory from terminal
 
         cd <project_root_path>
         
-    * For my computer only (Tested on)
-                
-                cd C:\Projects\AI_Crime_Analytics
+        example: cd C:\Projects\AI_Crime_Analytics
 
-* Create conda environment (using **package-list.txt** file provided in this project root directory):
+* Add conda forge channel to conda config by executing the following conda command (required to install the packages):
+    
+        conda config --append channels conda-forge
+
+* Create conda environment (using **package-list.txt** file provided in this project root directory to install all the required packages):
     * Reference link: https://docs.conda.io/projects/conda/en/latest/commands/list.html
     
-                conda create -n <environment_name> --file <...>\AI_Crime_Analytics\package-list.txt 
+                conda create -n <environment_name> --file <project_root_path>\AI_Crime_Analytics\package-list.txt 
                 
-        * For my computer only (Tested on)
-                
-                conda create -n <environment_name> --file C:\Projects\AI_Crime_Analytics\package-list.txt 
-            
-            
+                example: conda create -n <environment_name> --file C:\Projects\AI_Crime_Analytics\package-list.txt 
+ 
+    * If the environment was successfully created the following messages will be seen:
+        
+        Preparing transaction: done
+        
+        Verifying transaction: done
+        
+        Executing transaction: done
+        
+        -# To activate this environment, use
 
+        -#     $ conda activate ai_crime_analytics
+
+        -# To deactivate an active environment, use
+
+        -#     $ conda deactivate
+
+ 
 * Activate conda environment 
     
         activate <environment_name>
@@ -68,15 +81,21 @@
     * If the virtual environment was successfully activated, the command prompt will show (environment_name) on the left of each new line on the command prompt
        
 * Run project files 
+           
+    * Note: Please ensure that the python terminal is in the root of the project directory containing **main.py** file and the conda environment is activated
     
-        Project file run instructions
+    * run the following in the terminal to run the project:     
+        
+            python main.py   
+    
+    * Note: it takes some time to run the first time
     
 * Deactivate current conda environment (if needed)
 
         deactivate
 
 
-# Additional Instructions (needed during the development of project)
+# Additional Instructions (only needed during the development of project)
 * View conda package list:
     * Reference link: https://docs.conda.io/projects/conda/en/latest/commands/list.html
 
