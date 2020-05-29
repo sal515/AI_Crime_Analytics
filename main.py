@@ -80,7 +80,7 @@ if __name__ == "__main__":
         """Calculating the total heuristic and total actual costs of the path """
         timeout = 10
         data.total_path_costs, path = aStar.run(data, timeout)
-        print(f"Path search took: {round(data.time_taken, 4)}s")
+        print(f"* Path search took: {round(data.time_taken, 4)}s")
 
         if data.total_path_costs is not None and len(path) > 0:
 
