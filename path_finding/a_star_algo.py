@@ -1,4 +1,5 @@
 import itertools
+import threading
 import queue as q
 
 import numpy as np
@@ -43,7 +44,7 @@ class aStar:
         """ To get all possible adjacent nodes from a node - list of possible row and column translation """
         self.row_col_possibilities = [(1, -1), (1, 0), (1, 1), (0, -1), (0, 0), (0, 1), (-1, -1), (-1, 0), (-1, 1)]
 
-    def run(self):
+    def run(self, thread_stop_event: threading.Event):
         """ Create start vertex no parent and add to closed closed list """
         if self.start is None or self.destination is None:
             raise Exception("Error: Start or Destination vertex was not created")
@@ -55,7 +56,7 @@ class aStar:
         """ Creating destination vertex to check if it is blocked or not later on"""
         destination_vertex = vertex(None, self.destination, None, self.destination, None, None)
 
-        while not self.open_priority_queue.empty():
+        while not thread_stop_event.is_set() or not self.open_priority_queue.empty():
             """ Get the vertex with the lowest f value from the open priority queue/ open list """
             current_vertex: vertex = pq_helper.pop_vertex(self.open_priority_queue, self.open_dict)
 
@@ -153,6 +154,7 @@ class aStar:
             node_b: node = node.create(r, c + 1, data)
             forbidden_vertex = vertex(node_a, node_b, None, None, None, None)
             self.update_closed_list(forbidden_vertex)
+            # FIXME : Final clean
             # self.forbidden_vertices[str(hash(forbidden_vertex))] = ((r, c), (r, c + 1))
             # self.forbidden_vertices[str(hash(forbidden_vertex))] = forbidden_vertex
         c = 0
