@@ -1,5 +1,6 @@
 import itertools
 import queue as q
+import time
 
 import numpy as np
 from numpy import inf
@@ -43,7 +44,9 @@ class aStar:
         """ To get all possible adjacent nodes from a node - list of possible row and column translation """
         self.row_col_possibilities = [(1, -1), (1, 0), (1, 1), (0, -1), (0, 0), (0, 1), (-1, -1), (-1, 0), (-1, 1)]
 
-    def run(self):
+    def run(self, data, timeout):
+        timer_offset = time.perf_counter()
+
         """ Create start vertex no parent and add to closed closed list """
         if self.start is None or self.destination is None:
             raise Exception("Error: Start or Destination vertex was not created")
@@ -56,6 +59,10 @@ class aStar:
         destination_vertex = vertex(None, self.destination, None, self.destination, None, None)
 
         while not self.open_priority_queue.empty():
+            data.time_taken = time.perf_counter() - timer_offset
+            if data.time_taken > timeout:
+                break
+
             """ Get the vertex with the lowest f value from the open priority queue/ open list """
             current_vertex: vertex = pq_helper.pop_vertex(self.open_priority_queue, self.open_dict)
 
@@ -75,6 +82,7 @@ class aStar:
                     backtrace_vertex = backtrace_vertex.parent
 
                 """ Returning shortest path and cumulative costs f,g,h"""
+                data.time_taken = time.perf_counter() - timer_offset
                 return (round(self.total_cost_f, 3), round(self.total_cost_g, 3),
                         round(self.total_cost_h, 3)), self.path[::-1]
 
@@ -125,7 +133,11 @@ class aStar:
                 pq_helper.add_vertex(v, self.open_priority_queue, self.open_dict)
 
         """ while loop ended and destination was not found """
-        print("No Path Found from Start point to Destination point")
+        data.time_taken = time.perf_counter() - timer_offset
+        if data.time_taken > timeout:
+            print(f"Timed-out: No Path Found from Start point to Destination point")
+        else:
+            print(f"No Path Found from Start point to Destination point")
         return None, None
 
     def is_path_possible(self, vertex_to_check: vertex):

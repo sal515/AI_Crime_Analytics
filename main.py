@@ -73,11 +73,13 @@ if __name__ == "__main__":
     # test_destination = (data.lower_x_bound + 4 * gridlen, data.lower_y_bound + 4 * gridlen)
     # test_destination = (data.lower_x_bound + 4 * gridlen, data.lower_y_bound + 3 * gridlen)
 
-    if not (data.min_x <= test_destination[0] <= data.max_x + gridlen and data.min_y <= test_destination[1] <= data.max_y + gridlen):
+    if not (data.min_x <= test_destination[0] <= data.max_x + gridlen and data.min_y <= test_destination[
+        1] <= data.max_y + gridlen):
         print("Destination is out of bounds")
         quit(-1)
 
-    if not (data.min_x <= test_start[0] <= data.max_x + gridlen and data.min_y <= test_start[1] <= data.max_y + gridlen):
+    if not (data.min_x <= test_start[0] <= data.max_x + gridlen and data.min_y <= test_start[
+        1] <= data.max_y + gridlen):
         print("Destination is out of bounds")
         quit(-1)
 
@@ -94,14 +96,18 @@ if __name__ == "__main__":
     # FIXME: set timer for the astar run method
 
     """Calculating the total heuristic and total actual costs of the path """
-    data.total_path_costs, path = aStar.run()
+    timeout = 10
+    data.total_path_costs, path = aStar.run(data, timeout)
+    print(f"Path search took: {round(data.time_taken, 4)}s")
+
     data.max_of_heuristic_calc = max(aStar.heuristic_estimates_each_vertex) if data.path_found else None
 
     print("* Cumulative costs of the path, (f, g, h): ", data.total_path_costs)
     print("* Heuristic Estimates at each vertex: \n",
           aStar.heuristic_estimates_each_vertex[::-1] if data.path_found else None)
     if data.path_found and data.max_of_heuristic_calc < data.total_path_costs[0]:
-        print(f"* The heuristic was admissible, since max of h(v), {data.max_of_heuristic_calc} < c(v), {data.total_path_costs[2]} for every vertex, v")
+        print(
+            f"* The heuristic was admissible, since max of h(v), {data.max_of_heuristic_calc} < c(v), {data.total_path_costs[2]} for every vertex, v")
 
     """" === END: Path generation calls and data preparation === """
 

@@ -22,6 +22,7 @@ class visualize:
         median = {round(data.median, 2)}, std_dev={round(data.std_dev, 2)}, avg={round(data.average, 2)},
         actual_costs of (f,g,h)={data.total_path_costs if data.path_found else "-"}
         max_heuristic_calculated={data.max_of_heuristic_calc if data.path_found else "-"}
+path_search_time: {round(data.time_taken,4)}s
         """)
         plt.show()
 

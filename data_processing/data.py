@@ -81,6 +81,7 @@ class data:
         self.total_path_costs: tuple = None
         self.max_of_heuristic_calc: float = None
         self.path_found: bool = False
+        self.time_taken = None
 
         # FIXME: Final clean (Not required) Fix the functions to store the data as file
         # Store file/Save files
