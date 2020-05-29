@@ -9,7 +9,7 @@ class node:
         self.col = col
         """isblocked == 1 means the node/grid is blocked"""
         self.index = data.to_index(self.row, self.col, data.cols)
-        self.is_blocked = data.obstacles_arr[self.index] if self.index <= (data.rows * data.cols) - 1 else None
+        self.is_blocked = data.obstacles_arr[self.index] if (self.row < data.rows and self.col < data.cols) else None
 
         """ isNone is used for the padded nodes to reach the border vertices, otw the algorithm would avoid going to the boundary"""
         self.isNone: bool = True if self.is_blocked is None else False

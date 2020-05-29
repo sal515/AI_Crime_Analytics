@@ -120,8 +120,8 @@ class aStar:
                     continue
 
                 if v_key in self.open_dict:
-                    for node_entry in self.open_dict[v_key]:
-                        if v.g > node_entry[2].g:
+                    for old_vertex in self.open_dict[v_key]:
+                        if v.g > old_vertex[2].g:
                             continue
 
                 """Add eligible vertices to the open list / priority queue"""
