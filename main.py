@@ -95,8 +95,8 @@ if __name__ == "__main__":
 
         """" === END: Path generation calls and data preparation === """
 
-        print("\nPlease wait, Generating the plot...")
-        print(" Note: for smaller grids plotting takes quite some time\n")
+        print("\n* Please wait, Generating the plot...")
+        print(" * Note: for smaller grids plotting takes quite some time\n")
 
         """ Draw data and grids on the figure plot """
         fig1 = plt.figure(figsize=(15, 15))
@@ -115,6 +115,6 @@ if __name__ == "__main__":
             visualize.draw_path(data, path, ax)
         visualize.save_figure(plt, "all_crime_data.png", figures_dir_path)
         visualize.plot_show(plt, data)
-        print("\nPlot generation complete")
+        print("\n* Plot generation complete")
 
-    print("\n=== program terminated ===")
+    print("\n*** Program terminated *** ===")

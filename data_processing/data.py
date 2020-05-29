@@ -194,5 +194,5 @@ class data:
         print("* Standard Deviation: ", self.std_dev)
         # print("* Obstacles array: ", self.obstacles_arr)
         print("* Obstacles Matrix - readable-view: ", self.obstacles_matrix_readable())
-        print("""Note: for the Obstacle Matrix 
+        print("""* Note: for the Obstacle Matrix 
         0 - Non-blocked grids, 1 - Blocked grids""")
