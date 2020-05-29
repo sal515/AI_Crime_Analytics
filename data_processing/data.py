@@ -1,9 +1,11 @@
 import math
+import sys
 import geopandas
 import numpy as np
 from functools import reduce
 from collections.abc import Iterable
 
+np.set_printoptions(threshold=sys.maxsize)
 
 class data:
     def __init__(self, sqr_grid_length, sqr_grid_length_pad, threshold, data_file_path) -> None:
@@ -159,10 +161,10 @@ class data:
     """ Print out function definitions """
 
     def obstacles_matrix_readable(self):
-        return np.flipud(self.obstacles_arr.reshape(self.rows, self.cols))
+        return list(np.flipud(self.obstacles_arr.reshape(self.rows, self.cols)))
 
     def crime_rate_matrix_readable(self):
-        return np.flipud(self.crime_rate_arr.reshape(self.rows, self.cols))
+        return list(np.flipud(self.crime_rate_arr.reshape(self.rows, self.cols)))
 
     def crime_rate_matrix(self):
         return self.crime_rate_arr.reshape(self.rows, self.cols)
