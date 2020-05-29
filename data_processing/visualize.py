@@ -17,12 +17,10 @@ class visualize:
         x-axis / columns """)
         plt.ylabel("""Latitude
         y-axis / rows """)
-        plt.title(f"""Crime rate plot : {data.threshold}% threshold
-        grid_size = {data.sqr_grid_length}, threshold_value= {round(data.threshold_val, 2)} 
-        median = {round(data.median, 2)}, std_dev={round(data.std_dev, 2)}, avg={round(data.average, 2)},
-        actual_costs of (f,g,h)={data.total_path_costs if data.path_found else "-"}
-        max_heuristic_calculated={data.max_of_heuristic_calc if data.path_found else "-"}
-        """)
+        plt.title(
+            f"""Crime rate plot : {data.threshold}% threshold, grid_size = {data.sqr_grid_length}, threshold_value= {round(data.threshold_val, 2)} 
+        median = {round(data.median, 2)}, std_dev={round(data.std_dev, 2)}, avg={round(data.average, 2)}, actual_costs of (f,g,h)={data.total_path_costs if data.path_found else "-"}
+        max_heuristic_calculated={data.max_of_heuristic_calc if data.path_found else "-"} path_search_time: {round(data.time_taken, 4)}s""")
         plt.show()
 
     @staticmethod
@@ -51,10 +49,18 @@ class visualize:
             if data.obstacles_arr[index]:
                 self.draw_a_grid(index, data, ax, color, annotate_row_col)
 
-    def draw_initial_grids(self, data: dp.data, ax, color="purple", annotate_row_col=False):
-        """ To view crime rate grids: Initially plot all the grids using the safe color """
-        for index in range(0, data.obstacles_arr.__len__()):
-            self.draw_a_grid(index, data, ax, color, annotate_row_col)
+
+    # To view crime rate grids: Initially plot all the grids using the safe color
+    def draw_initial_patch(self, plt, ax, data: dp.data, grid_buffer, color="purple"):
+        plt.axis(
+            [(data.min_x - grid_buffer), (data.max_x + grid_buffer), (data.min_y - grid_buffer),
+             (data.max_y + grid_buffer)])
+
+        origin_point = (data.min_x, data.min_y)
+
+        rect_initial = patches.Rectangle(origin_point, data.max_x_length, data.max_y_length, color=color)
+        ax.add_patch(rect_initial)
+
 
     @staticmethod
     def draw_a_grid(index, data: dp.data, ax, color: str, annotate_row_col: bool):
@@ -70,13 +76,15 @@ class visualize:
 
         if annotate_row_col:
             # Annotating the row and col on the grids for easier debugging
-            ax.annotate(f"{row_col[0], row_col[1]}", (cx, cy), color='red', weight='bold', fontsize=10, ha='center',
+            display_str = f"""{data.crime_rate_arr[index]}
+            {row_col[0], row_col[1]}"""
+            ax.annotate(display_str, (cx, cy), color='red', weight='bold', fontsize=10, ha='center',
                         va='center')
 
         else:
-            display_str = f"""{data.crime_rate_arr[index]}
-{row_col[0], row_col[1]}"""
-            ax.annotate(display_str, (cx, cy), color='red', weight='bold', fontsize=10, ha='center',
+
+            ax.annotate("".join([str(data.crime_rate_arr[index])]), (cx, cy), color='red', weight='bold', fontsize=10,
+                        ha='center',
                         va='center')
 
         ax.add_patch(grid)

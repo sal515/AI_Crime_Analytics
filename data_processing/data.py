@@ -1,8 +1,11 @@
 import math
+import sys
 import geopandas
 import numpy as np
 from functools import reduce
 from collections.abc import Iterable
+
+np.set_printoptions(threshold=sys.maxsize)
 
 
 class data:
@@ -26,13 +29,6 @@ class data:
         self.min_y = min(self.y)
         self.max_x = max(self.x)
         self.max_y = max(self.y)
-
-        # FIXME : Final clean
-        # GTK: Alternative of finding min and max of x and y using pandas
-        # By creating a polygon using all the crime data points
-        # poly = polygon(x_y_pair)
-        # bounds = poly.bounds
-        # print("bounds: (minx-0, miny-1, maxx-2, maxy-3) ", bounds)
 
         """ To draw the grids: calculating required rows and cols, NOTE: rows -> are y and cols are x """
         self.cols = int(math.ceil(abs(abs(self.max_x) - abs(self.min_x)) / self.sqr_grid_length))
@@ -81,15 +77,7 @@ class data:
         self.total_path_costs: tuple = None
         self.max_of_heuristic_calc: float = None
         self.path_found: bool = False
-
-        # FIXME: Final clean (Not required) Fix the functions to store the data as file
-        # Store file/Save files
-        # To save crime data as CSV format to read the data
-        # self.crime_data.to_csv("".join([figure_dir_path, "crime_data.csv"]), index=True)
-
-        # To save coordinate data as CSV format to read the data
-        # output = np.column_stack((np.array(x).flatten(), np.array(y).flatten()))
-        # np.savetxt("".join([figures_dir_path, "output.csv"]), output, delimiter=",")
+        self.time_taken = None
 
     """Updating crime matrix with number of crimes occurred corresponding to grids"""
 
@@ -205,5 +193,7 @@ class data:
         print("* Median: ", self.median)
         print("* Average: ", self.average)
         print("* Standard Deviation: ", self.std_dev)
-        print("* Obstacles array: ", self.obstacles_arr)
+        # print("* Obstacles array: ", self.obstacles_arr)
         print("* Obstacles Matrix - readable-view: ", self.obstacles_matrix_readable())
+        print("""* Note: for the Obstacle Matrix 
+        0 - Non-blocked grids, 1 - Blocked grids""")

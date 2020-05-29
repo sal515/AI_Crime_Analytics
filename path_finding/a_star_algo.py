@@ -1,5 +1,6 @@
 import itertools
 import queue as q
+import time
 
 import numpy as np
 from numpy import inf
@@ -43,7 +44,9 @@ class aStar:
         """ To get all possible adjacent nodes from a node - list of possible row and column translation """
         self.row_col_possibilities = [(1, -1), (1, 0), (1, 1), (0, -1), (0, 0), (0, 1), (-1, -1), (-1, 0), (-1, 1)]
 
-    def run(self):
+    def run(self, data, timeout):
+        timer_offset = time.perf_counter()
+
         """ Create start vertex no parent and add to closed closed list """
         if self.start is None or self.destination is None:
             raise Exception("Error: Start or Destination vertex was not created")
@@ -56,6 +59,10 @@ class aStar:
         destination_vertex = vertex(None, self.destination, None, self.destination, None, None)
 
         while not self.open_priority_queue.empty():
+            data.time_taken = time.perf_counter() - timer_offset
+            if data.time_taken > timeout:
+                break
+
             """ Get the vertex with the lowest f value from the open priority queue/ open list """
             current_vertex: vertex = pq_helper.pop_vertex(self.open_priority_queue, self.open_dict)
 
@@ -75,12 +82,12 @@ class aStar:
                     backtrace_vertex = backtrace_vertex.parent
 
                 """ Returning shortest path and cumulative costs f,g,h"""
+                data.time_taken = time.perf_counter() - timer_offset
                 return (round(self.total_cost_f, 3), round(self.total_cost_g, 3),
                         round(self.total_cost_h, 3)), self.path[::-1]
 
             """ Check if the start node is surrounded by blocked nodes, if so then exit"""
             if not self.is_path_possible(start_vertex):
-                print("start")
                 break
 
             """ Similar to the last check, do it for the destination node"""
@@ -92,10 +99,6 @@ class aStar:
                 map(lambda x: node.create(current_vertex.node_b.row + x[0], current_vertex.node_b.col + x[1],
                                           self.data),
                     self.row_col_possibilities))
-
-            # FIXME : Clean for final sub
-            # Test print all nodes
-            # [print(i) for i in zip(enumerate(nodes)) if i is not None]
 
             """ Generate all the adjacent vertices from the current vertex using adjacent nodes"""
             index = itertools.count()
@@ -125,7 +128,11 @@ class aStar:
                 pq_helper.add_vertex(v, self.open_priority_queue, self.open_dict)
 
         """ while loop ended and destination was not found """
-        print("No Path Found from Start point to Destination point")
+        data.time_taken = time.perf_counter() - timer_offset
+        if data.time_taken > timeout:
+            print(f"* Timed-out: No Path Found from Start point to Destination point")
+        else:
+            print(f"* No Path Found from Start point to Destination point")
         return None, None
 
     def is_path_possible(self, vertex_to_check: vertex):
@@ -139,30 +146,11 @@ class aStar:
                                                 self.data)) is not None else 0, self.row_col_possibilities))
 
         if np.all(np.concatenate((np.array(nodes)[3:5], np.array(nodes)[6:8])) == 1):
-            print("returning false")
             return False
 
         return True
 
     """" Helper functions """
-
-    def update_forbidden_vertices(self, data: dt):
-        r = 0
-        for c in range(0, self.data.cols - 1):
-            node_a: node = node.create(r, c, data)
-            node_b: node = node.create(r, c + 1, data)
-            forbidden_vertex = vertex(node_a, node_b, None, None, None, None)
-            self.update_closed_list(forbidden_vertex)
-            # self.forbidden_vertices[str(hash(forbidden_vertex))] = ((r, c), (r, c + 1))
-            # self.forbidden_vertices[str(hash(forbidden_vertex))] = forbidden_vertex
-        c = 0
-        for r in range(0, self.data.rows - 1):
-            node_a: node = node.create(r, c, data)
-            node_b: node = node.create(r + 1, c, data)
-            forbidden_vertex = vertex(node_a, node_b, None, None, None, None)
-            self.update_closed_list(forbidden_vertex)
-            # self.forbidden_vertices[str(hash(forbidden_vertex))] = ((r, c), (r + 1, c))
-            # self.forbidden_vertices[str(hash(forbidden_vertex))] = forbidden_vertex
 
     def update_closed_list(self, current_vertex):
         current_vertex_key = str(hash(current_vertex))
@@ -175,76 +163,3 @@ class aStar:
 # TEST CODE
 if __name__ == "__main__":
     from data_processing.data import data as dt
-
-    obstacles_array_50_percent = [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1,
-                                  0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
-                                  0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
-                                  1, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1,
-                                  1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0,
-                                  0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
-                                  1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0,
-                                  0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1,
-                                  0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0,
-                                  0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0,
-                                  1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1,
-                                  0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,
-                                  0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0,
-                                  0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1]
-
-    dt = dt(0.002, 0.0001, 50, "..\\data\\Shape\\crime_dt.shp")
-
-    dt.obstacles_arr = obstacles_array_50_percent
-
-    # Test node
-    # origin_node = node(dt.lower_x_bound + 1 * 0.002, dt.lower_y_bound + 1 * 0.002, dt)
-    # destination_node = node(dt.lower_x_bound + 2 * 0.002, dt.lower_y_bound + 6 * 0.002, dt)
-    #
-    # node1 = node(dt.lower_x_bound + -1 * 0.002, dt.lower_y_bound + 6 * 0.002, dt)
-    # node2 = node(dt.lower_x_bound + 2 * 0.002, dt.lower_y_bound + 6 * 0.002, dt)
-    # node3 = node(dt.lower_x_bound + 2 * 0.002, dt.lower_y_bound + 6 * 0.002, dt)
-
-    origin_node = node.create(0, 0, dt)
-    destination_node = node.create(4, 2, dt)
-
-    node1 = node.create(1, 1, dt)
-    node2 = node.create(2, 1, dt)
-    node3 = node.create(2, 2, dt)
-
-    print("start node: ", origin_node)
-    print("destination node: ", destination_node)
-    print(origin_node == destination_node)
-    print(origin_node == origin_node)
-
-    # Test vertex
-    v1 = vertex(None, origin_node, None, destination_node, None, None)
-    v2 = vertex(origin_node, node1, v1, destination_node, None, None)
-    v3 = vertex(node1, node2, v2, destination_node, None, None)
-    v4 = vertex(node2, node3, v3, destination_node, None, None)
-
-    print("(v1 == v1)", (v1 == v1))
-    print("(v1 == v2)", (v1 == v2))
-    print("(v2 == v3)", (v2 == v3))
-    print("(v3 == v4)", (v3 == v4))
-
-    # Generate possibles nodes
-    # node_possibilities = [(-1, 0), (1, 0), (0, 1), (0, -1), (-1, 1), (1, 1), (-1, -1), (1, -1)]
-    # node_possibilities = [(1, -1), (1, 0), (1, 1), (0, -1), (0, 0), (0, 1), (-1, -1), (-1, 0), (-1, 1)]
-
-    row_col_possibilities = [(1, -1), (1, 0), (1, 1), (0, -1), (0, 1), (-1, -1), (-1, 0), (-1, 1)]
-
-    current_node = v1.node_b
-    node_possibilities = list(
-        map(lambda x: node.create(current_node.row + x[0], current_node.col + x[1], dt), row_col_possibilities))
-
-    [print(i) for i in zip(enumerate(node_possibilities)) if i is not None]
-
-    index = itertools.count()
-    vertices_possible = list(
-        map(lambda x, i: vertex(current_node, x, v1, destination_node, i, node_possibilities), node_possibilities,
-            index))
-
-    [print(i) for i in zip(enumerate(vertices_possible))]
-
-    [print(hash(i)) for i in zip(enumerate(vertices_possible)) if i is not None]
-
-    pass
