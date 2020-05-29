@@ -28,7 +28,7 @@ class ui:
         print("")
 
         x = input(
-            f" {position_name} position : Please provide {data.min_x} <= x <= {data.max_x + data.sqr_grid_length_pad} coordinate: ")
+            f"{position_name} position : Please provide {data.min_x} <= x <= {data.max_x + data.sqr_grid_length_pad} coordinate: ")
 
         while not ui.x_y_sanitization_limits_check(data, x, True):
             print(f"Invalid x = {x} provided")

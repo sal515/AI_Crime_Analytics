@@ -20,7 +20,8 @@ def sanitize_grid_length(sqr_grid_length):
 if __name__ == "__main__":
     """ Debug variables """
     # FIXME : Set debug to 0 before submission
-    debug = 1
+    # debug = 1
+    debug = 0
     test_grid_size = "0.002"
     test_grid_size = "0.010"
     test_threshold = 50
@@ -31,100 +32,88 @@ if __name__ == "__main__":
 
     from ui import ui
     import data_processing.data as dt
-    from path_finding.a_star_algo import aStar
-    import data_processing.visualize as visualize
+    from path_finding.a_star_algo import aStar as a_star
+    from  data_processing.visualize import visualize as visual
 
     """ Constant Path Variables """
     shapes_data_path = "data\\Shape\\crime_dt.shp"
     figures_dir_path = "figures\\"
 
-    """ Get grid length and threshold from the user """
-    sqr_grid_length = ui.ask_for_grid_length() if debug == 0 else test_grid_size
-    sqr_grid_length, sqr_grid_length_padding = sanitize_grid_length(sqr_grid_length)
+    once = True
 
-    threshold = ui.ask_for_threshold() if debug == 0 else test_threshold
+    while True:
 
-    # Fixme: Why is everything blocked for threshold < 50 and 0.001 grids
+        if not once:
+            choice = input("\n\nDo you want to continue? y/n ")
+            if choice.isalpha() and (choice == "n" or choice == "N"):
+                break
+        once = False
 
-    """ Logic starts """
+        """ Get grid length and threshold from the user """
+        sqr_grid_length = ui.ask_for_grid_length() if debug == 0 else test_grid_size
+        sqr_grid_length, sqr_grid_length_padding = sanitize_grid_length(sqr_grid_length)
 
-    """ Crime data processing and matrices generated for grid plotting & statistics calculation """
-    data = dt.data(sqr_grid_length, sqr_grid_length_padding, threshold, shapes_data_path)
-    data.update_crime_rate_array()
-    data.sort_crime_data_array()
-    data.calculate_statistics()
-    data.update_obstacles_arr()
+        threshold = ui.ask_for_threshold() if debug == 0 else test_threshold
 
-    """ Print all the generated data and matrices """
-    data.print()
+        # Fixme: Why is everything blocked for threshold < 50 and 0.001 grids
 
-    """" === START: Path generation calls and data preparation === """
+        """ Logic starts """
 
-    """ ===== Test coordinates for start and destination for debug ===== """
-    # FIXME: Final clear test values
-    gridlen = data.sqr_grid_length + data.sqr_grid_length_pad
-    # gridlen = data.sqr_grid_length
-    test_start = (data.lower_x_bound + 0 * gridlen, data.lower_y_bound + 0 * gridlen)
-    # test_start = (data.lower_x_bound + 1 * gridlen, data.lower_y_bound + 2 * gridlen)
-    test_destination = (data.lower_x_bound + 0 * gridlen, data.lower_y_bound + 3 * gridlen)
-    # test_destination = (data.lower_x_bound + 2 * gridlen, data.lower_y_bound + 0 * gridlen)
-    # test_destination = (data.lower_x_bound + 2 * gridlen, data.lower_y_bound + 2 * gridlen)
-    # test_destination = (data.lower_x_bound + 1 * gridlen, data.lower_y_bound + 3 * gridlen)
-    # test_destination = (data.lower_x_bound + 4 * gridlen, data.lower_y_bound + 4 * gridlen)
-    # test_destination = (data.lower_x_bound + 4 * gridlen, data.lower_y_bound + 3 * gridlen)
+        """ Crime data processing and matrices generated for grid plotting & statistics calculation """
+        data = dt.data(sqr_grid_length, sqr_grid_length_padding, threshold, shapes_data_path)
+        data.update_crime_rate_array()
+        data.sort_crime_data_array()
+        data.calculate_statistics()
+        data.update_obstacles_arr()
 
-    if not (data.min_x <= test_destination[0] <= data.max_x + gridlen and data.min_y <= test_destination[
-        1] <= data.max_y + gridlen):
-        print("Destination is out of bounds")
-        quit(-1)
+        """ Print all the generated data and matrices """
+        data.print()
 
-    if not (data.min_x <= test_start[0] <= data.max_x + gridlen and data.min_y <= test_start[
-        1] <= data.max_y + gridlen):
-        print("Destination is out of bounds")
-        quit(-1)
+        """" === START: Path generation calls and data preparation === """
 
-    # Start x = -73.58983070149999 y = 45.4900685085
-    # End x = -73.56 y = 45.50
-    """ ===== Test coordinates for start and destination for debug ===== """
+        """ Get start and destination node coordinates from the user """
+        start = ui.ask_for_position(data, "Start") if debug == 0 else test_start
+        destination = ui.ask_for_position(data, "Destination") if debug == 0 else test_destination
 
-    """ Get start and destination node coordinates from the user """
-    start = ui.ask_for_position(data, "Start") if debug == 0 else test_start
-    destination = ui.ask_for_position(data, "Destination") if debug == 0 else test_destination
+        """ Generate the path from the start position to the destination position using A* Algorithm """
+        aStar = a_star(start, destination, data.obstacles_arr, data)
 
-    """ Generate the path from the start position to the destination position using A* Algorithm """
-    aStar = aStar(start, destination, data.obstacles_arr, data)
-    # FIXME: set timer for the astar run method
+        """Calculating the total heuristic and total actual costs of the path """
+        timeout = 10
+        data.total_path_costs, path = aStar.run(data, timeout)
+        print(f"Path search took: {round(data.time_taken, 4)}s")
 
-    """Calculating the total heuristic and total actual costs of the path """
-    timeout = 10
-    data.total_path_costs, path = aStar.run(data, timeout)
-    print(f"Path search took: {round(data.time_taken, 4)}s")
+        if data.total_path_costs is not None and len(path) > 0:
 
-    data.max_of_heuristic_calc = max(aStar.heuristic_estimates_each_vertex) if data.path_found else None
+            data.max_of_heuristic_calc = max(aStar.heuristic_estimates_each_vertex) if data.path_found else None
 
-    print("* Cumulative costs of the path, (f, g, h): ", data.total_path_costs)
-    print("* Heuristic Estimates at each vertex: \n",
-          aStar.heuristic_estimates_each_vertex[::-1] if data.path_found else None)
-    if data.path_found and data.max_of_heuristic_calc < data.total_path_costs[0]:
-        print(
-            f"* The heuristic was admissible, since max of h(v), {data.max_of_heuristic_calc} < c(v), {data.total_path_costs[2]} for every vertex, v")
+            print("* Cumulative costs of the path, (f, g, h): ", data.total_path_costs)
+            print("* Heuristic Estimates at each vertex: \n",
+                  aStar.heuristic_estimates_each_vertex[::-1] if data.path_found else None)
+            if data.path_found and data.max_of_heuristic_calc < data.total_path_costs[0]:
+                print(
+                    f"* The heuristic was admissible, since max of h(v), {data.max_of_heuristic_calc} < c(v), {data.total_path_costs[2]} for every vertex, v")
 
-    """" === END: Path generation calls and data preparation === """
+        """" === END: Path generation calls and data preparation === """
 
-    """ Draw data and grids on the figure plot """
-    fig1 = plt.figure(figsize=(15, 15))
-    # fig1 = plt.figure(figsize=(25, 25))
-    ax = fig1.add_subplot(1, 1, 1)
+        print("\nPlease wait, Generating the plot...")
+        print(" Note: for smaller grids plotting takes quite some time\n")
 
-    visualize = visualize.visualize()
+        """ Draw data and grids on the figure plot """
+        fig1 = plt.figure(figsize=(15, 15))
+        # fig1 = plt.figure(figsize=(25, 25))
+        ax = fig1.add_subplot(1, 1, 1)
 
-    visualize.plot_crime_coordinates(plt, data)
-    visualize.draw_initial_grids(data, ax)
-    visualize.draw_grid_lines(plt, data)
-    visualize.draw_all_blocked_grids(data, ax)
-    if data.path_found:
-        visualize.draw_path(data, path, ax)
-    visualize.save_figure(plt, "all_crime_data.png", figures_dir_path)
-    visualize.plot_show(plt, data)
+        visualize = visual()
+
+        visualize.plot_crime_coordinates(plt, data)
+        visualize.draw_initial_grids(data, ax)
+        visualize.draw_grid_lines(plt, data)
+        visualize.draw_all_blocked_grids(data, ax)
+        if data.path_found:
+            visualize.draw_path(data, path, ax)
+        visualize.save_figure(plt, "all_crime_data.png", figures_dir_path)
+        visualize.plot_show(plt, data)
+        print("\nPlot generation complete")
 
     print("\n=== program terminated ===")

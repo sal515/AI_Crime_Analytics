@@ -101,10 +101,6 @@ class aStar:
                                           self.data),
                     self.row_col_possibilities))
 
-            # FIXME : Clean for final sub
-            # Test print all nodes
-            # [print(i) for i in zip(enumerate(nodes)) if i is not None]
-
             """ Generate all the adjacent vertices from the current vertex using adjacent nodes"""
             index = itertools.count()
             vertices = list(
