@@ -23,7 +23,7 @@ if __name__ == "__main__":
     # debug = 1
     debug = 0
     test_grid_size = "0.002"
-    test_grid_size = "0.010"
+    # test_grid_size = "0.010"
     test_threshold = 50
 
     """ Main Driver file imports """
@@ -55,8 +55,6 @@ if __name__ == "__main__":
 
         threshold = ui.ask_for_threshold() if debug == 0 else test_threshold
 
-        # Fixme: Why is everything blocked for threshold < 50 and 0.001 grids
-
         """ Logic starts """
 
         """ Crime data processing and matrices generated for grid plotting & statistics calculation """
@@ -68,6 +66,7 @@ if __name__ == "__main__":
 
         """ Print all the generated data and matrices """
         data.print()
+
 
         """" === START: Path generation calls and data preparation === """
 
@@ -105,9 +104,11 @@ if __name__ == "__main__":
         ax = fig1.add_subplot(1, 1, 1)
 
         visualize = visual()
+        # visualize.plot_crime_coordinates(plt, data)
 
-        visualize.plot_crime_coordinates(plt, data)
-        visualize.draw_initial_grids(data, ax)
+        grid_buffer = data.sqr_grid_length * 0.5
+        visualize.draw_initial_patch(plt, ax, data, grid_buffer)
+
         visualize.draw_grid_lines(plt, data)
         visualize.draw_all_blocked_grids(data, ax)
         if data.path_found:
